@@ -74,11 +74,6 @@ export class CargaAcademicaController {
     description: 'Filtrar por ID del grupo',
   })
   @ApiQuery({
-    name: 'asignaturaId',
-    required: false,
-    description: 'Filtrar por ID de la asignatura',
-  })
-  @ApiQuery({
     name: 'activo',
     required: false,
     type: Boolean,
@@ -96,6 +91,16 @@ export class CargaAcademicaController {
     required: false,
     type: Number,
     description: 'Cantidad de elementos por página (opcional, por defecto 10)',
+  })
+  @ApiQuery({
+    name: 'carrera',
+    required: false,
+    description: 'Filtrar por carrera',
+  })
+  @ApiQuery({
+    name: 'asignatura',
+    required: false,
+    description: 'Filtrar por asignatura',
   })
   @ApiResponse({
     status: 200,
