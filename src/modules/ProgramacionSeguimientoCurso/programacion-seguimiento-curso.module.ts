@@ -8,7 +8,6 @@ import { SeguimientoDetalle } from './entities/seguimiento-detalle.entity';
 import { NotificacionSeguimiento } from './entities/notificacion-seguimiento.entity';
 import { CargaAcademica } from '../CargaAcademica/entities/carga-academica.entity';
 import { Usuario } from '../Usuarios/entities/usuario.entity';
-import { Tema } from '../Temas/entities/tema.entity';
 import { Cuatrimestre } from '../Cuatrimestres/entities/cuatrimestre.entity';
 
 @Module({
@@ -19,7 +18,6 @@ import { Cuatrimestre } from '../Cuatrimestres/entities/cuatrimestre.entity';
       NotificacionSeguimiento,
       CargaAcademica,
       Usuario,
-      Tema,
       Cuatrimestre,
     ]),
     ScheduleModule.forRoot(),

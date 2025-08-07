@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import { UsuariosSeed } from './usuarios.seed';
+import { ProfesoresSeed } from './profesores.ts';
 
 export const seedDatabase = async (dataSource: DataSource) => {
   try {
@@ -7,6 +8,7 @@ export const seedDatabase = async (dataSource: DataSource) => {
 
     // Ejecutar seed de usuarios
     await UsuariosSeed(dataSource);
+    await ProfesoresSeed(dataSource);
 
     console.log('✅ Seeds ejecutados correctamente');
   } catch (error) {
