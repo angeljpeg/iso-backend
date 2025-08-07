@@ -42,9 +42,8 @@ export class AsignaturasService {
             continue;
           }
 
-          // En el método findAll, cambiar:
           // Usar directamente la asignatura de los datos estáticos
-          allAsignaturas.push(asignatura); // Ya incluye los temas
+          allAsignaturas.push(asignatura);
         }
       }
 
@@ -76,10 +75,9 @@ export class AsignaturasService {
     }
   }
 
-  // Obtener asignatura por nombre (más útil que por ID artificial)
+  // Obtener asignatura por nombre
   findOne(nombre: string): IAsignatura {
     try {
-      // Buscar en todas las carreras
       for (const carreraData of carreras) {
         for (const asignatura of carreraData.asignaturas) {
           if (asignatura.nombre.toLowerCase() === nombre.toLowerCase()) {
@@ -98,7 +96,7 @@ export class AsignaturasService {
     }
   }
 
-  // Obtener asignatura por nombre con información de carrera
+  // Obtener asignatura con información de carrera
   findOneWithCarrera(nombre: string): {
     asignatura: IAsignatura;
     carrera: ICarrera;
@@ -120,81 +118,42 @@ export class AsignaturasService {
         message: 'Asignatura no encontrada',
       });
     } catch (error) {
-      if (error instanceof ErrorManager) {
-        throw error;
-      }
-      throw new ErrorManager({
-        type: 'INTERNAL_SERVER_ERROR',
-        message: 'Error al buscar la asignatura',
-      });
+      console.log(error);
+      throw error;
     }
   }
 
-  // Obtener todas las asignaturas de una carrera específica
+  // Obtener asignaturas por carrera
   findByCarrera(codigoCarrera: string): IAsignatura[] {
     try {
-      const carrera = carreras.find(
-        (c) => c.codigo.toUpperCase() === codigoCarrera.toUpperCase(),
+      const carreraData = carreras.find(
+        (c) => c.codigo.toLowerCase() === codigoCarrera.toLowerCase(),
       );
 
-      if (!carrera) {
+      if (!carreraData) {
         throw new ErrorManager({
           type: 'NOT_FOUND',
           message: 'Carrera no encontrada',
         });
       }
 
-      return carrera.asignaturas;
-    } catch (error) {
-      if (error instanceof ErrorManager) {
-        throw error;
-      }
-      throw new ErrorManager({
-        type: 'INTERNAL_SERVER_ERROR',
-        message: 'Error al obtener asignaturas de la carrera',
-      });
-    }
-  }
-
-  // Nuevo método para obtener asignatura con sus temas estáticos
-  findOneWithTemas(nombre: string): IAsignatura {
-    try {
-      for (const carreraData of carreras) {
-        for (const asignatura of carreraData.asignaturas) {
-          if (asignatura.nombre.toLowerCase() === nombre.toLowerCase()) {
-            // Retorna la asignatura completa con temas
-            return asignatura;
-          }
-        }
-      }
-
-      throw new ErrorManager({
-        type: 'NOT_FOUND',
-        message: 'Asignatura no encontrada',
-      });
+      return carreraData.asignaturas;
     } catch (error) {
       console.log(error);
       throw error;
     }
   }
 
-  // Método para obtener temas de una asignatura específica
+  // Obtener asignatura con temas (redundante ya que IAsignatura incluye temas)
+  findOneWithTemas(nombre: string): IAsignatura {
+    return this.findOne(nombre); // Los temas ya están incluidos
+  }
+
+  // Obtener temas de una asignatura específica
   getTemasByAsignatura(nombreAsignatura: string): ITema[] {
     try {
-      for (const carreraData of carreras) {
-        for (const asignatura of carreraData.asignaturas) {
-          if (
-            asignatura.nombre.toLowerCase() === nombreAsignatura.toLowerCase()
-          ) {
-            return asignatura.temas;
-          }
-        }
-      }
-
-      throw new ErrorManager({
-        type: 'NOT_FOUND',
-        message: 'Asignatura no encontrada',
-      });
+      const asignatura = this.findOne(nombreAsignatura);
+      return asignatura.temas;
     } catch (error) {
       console.log(error);
       throw error;

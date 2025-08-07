@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { carreras } from '../../lib/carreras';
 import { ErrorManager } from '../../utils/error-manager';
+import { ITema } from '../../common/interfaces/carrera.interface';
 
 @Injectable()
 export class TemasService {
@@ -14,13 +15,13 @@ export class TemasService {
     page?: number,
     limit?: number,
   ): {
-    data: any[];
+    data: ITema[];
     total: number;
     page: number;
     limit: number;
     totalPages: number;
   } {
-    const allTemas: any[] = [];
+    const allTemas: ITema[] = [];
     try {
       // Recopilar todos los temas de todas las carreras y asignaturas
       for (const carrera of carreras) {
@@ -44,35 +45,8 @@ export class TemasService {
               continue;
             }
 
-            // Crear objeto tema con formato similar al anterior
-            const temaFormatted = {
-              id: `${carrera.codigo}-${asignatura.nombre}-${tema.nombre}`.replace(
-                /\s+/g,
-                '-',
-              ),
-              nombre: tema.nombre,
-              unidad: tema.unidad,
-              semanaRecomendada: tema.semanaProgramada,
-              horasProgramadas: Math.floor(
-                asignatura.horasProgramadas / asignatura.temas.length,
-              ), // Distribución aproximada
-              descripcion: null,
-              activo: true, // Los datos estáticos siempre están activos
-              asignaturaId: asignatura.nombre,
-              asignatura: {
-                id: `${carrera.codigo}-${asignatura.nombre}`.replace(
-                  /\s+/g,
-                  '-',
-                ),
-                nombre: asignatura.nombre,
-                carrera: carrera.nombre,
-                activo: true,
-              },
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            };
-
-            allTemas.push(temaFormatted);
+            // Agregar el tema tal como está, sin formateo adicional
+            allTemas.push(tema);
           }
         }
       }
