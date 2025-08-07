@@ -5,7 +5,6 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
-  Index,
 } from 'typeorm';
 import { CargaAcademica } from '../../CargaAcademica/entities/carga-academica.entity';
 import { Usuario } from '../../Usuarios/entities/usuario.entity';
@@ -21,7 +20,6 @@ export enum EstadoSeguimiento {
 }
 
 @Entity('seguimiento_curso')
-@Index(['cargaAcademicaId', 'semana', 'cuatrimestreId'], { unique: true })
 export class SeguimientoCurso {
   @PrimaryGeneratedColumn('uuid')
   id: string;

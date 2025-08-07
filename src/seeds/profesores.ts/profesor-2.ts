@@ -3,11 +3,13 @@ import * as bcrypt from 'bcrypt';
 import { Usuario, RolUsuario } from '@modules/Usuarios/entities/usuario.entity';
 import { CargaAcademica } from '@modules/CargaAcademica/entities/carga-academica.entity';
 import { getCarreraByCodigo } from '@lib/carreras';
+import { Grupo } from '@modules/Grupos/entities/grupo.entity'; // ✅ Agregar import
 
 export const profesor2 = async (dataSource: DataSource) => {
   try {
     const profesorRepository = dataSource.getRepository(Usuario);
     const cargaAcademicaRepository = dataSource.getRepository(CargaAcademica);
+    const grupoRepository = dataSource.getRepository(Grupo); // ✅ Agregar repository
 
     const carrera = getCarreraByCodigo('TIDS');
     if (!carrera) {
@@ -37,22 +39,48 @@ export const profesor2 = async (dataSource: DataSource) => {
     await profesorRepository.save(profesor);
     console.log('Profesor 2 creado exitosamente');
 
+    // ✅ Buscar grupos disponibles
+    const gruposDisponibles = await grupoRepository.find({
+      where: { activo: true },
+      relations: ['cuatrimestreRelacion'],
+    });
+
+    if (gruposDisponibles.length === 0) {
+      console.log(
+        '⚠️ No hay grupos disponibles para asignar cargas académicas',
+      );
+      return;
+    }
+
     // Crear cargas académicas para este profesor
     const cargasAcademicas = [
       {
         carrera: carrera.nombre,
         asignatura: 'APLICACIONES WEB PARA I4.0',
+        grupoId: gruposDisponibles[0].id, // ✅ Asignar al primer grupo
       },
       {
         carrera: carrera.nombre,
         asignatura: 'BASES DE DATOS PARA COMPUTO EN LA NUBE',
+        grupoId: gruposDisponibles[1]?.id || gruposDisponibles[0].id, // ✅ Asignar al segundo grupo o primero si no hay más
       },
     ];
 
     for (const cargaData of cargasAcademicas) {
+      const grupo = await grupoRepository.findOne({
+        where: { id: cargaData.grupoId },
+        relations: ['cuatrimestreRelacion'],
+      });
+
+      if (!grupo) {
+        console.log(`⚠️ Grupo ${cargaData.grupoId} no encontrado`);
+        continue;
+      }
+
       const existingCarga = await cargaAcademicaRepository.findOne({
         where: {
           profesor: { id: profesor.id },
+          grupoId: cargaData.grupoId,
           carrera: cargaData.carrera,
           asignatura: cargaData.asignatura,
         },
@@ -63,10 +91,14 @@ export const profesor2 = async (dataSource: DataSource) => {
           profesor,
           carrera: cargaData.carrera,
           asignatura: cargaData.asignatura,
+          grupoId: cargaData.grupoId, // ✅ Incluir grupoId
+          cuatrimestreId: grupo.cuatrimestreId, // ✅ Incluir cuatrimestreId
         });
 
         await cargaAcademicaRepository.save(cargaAcademica);
-        console.log(`Carga académica creada: ${cargaData.asignatura}`);
+        console.log(
+          `Carga académica creada: ${cargaData.asignatura} - Grupo: ${grupo.nombreGenerado}`,
+        );
       }
     }
   } catch (error) {
