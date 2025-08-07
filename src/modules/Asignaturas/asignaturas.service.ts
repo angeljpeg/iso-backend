@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { carreras } from '../../lib/carreras';
-import { IAsignatura, ICarrera } from '@interfaces/carrera.interface';
+import { IAsignatura, ICarrera, ITema } from '@interfaces/carrera.interface';
 import { ErrorManager } from '../../utils/error-manager';
 
 @Injectable()
@@ -42,8 +42,9 @@ export class AsignaturasService {
             continue;
           }
 
+          // En el método findAll, cambiar:
           // Usar directamente la asignatura de los datos estáticos
-          allAsignaturas.push(asignatura);
+          allAsignaturas.push(asignatura); // Ya incluye los temas
         }
       }
 
@@ -152,6 +153,51 @@ export class AsignaturasService {
         type: 'INTERNAL_SERVER_ERROR',
         message: 'Error al obtener asignaturas de la carrera',
       });
+    }
+  }
+
+  // Nuevo método para obtener asignatura con sus temas estáticos
+  findOneWithTemas(nombre: string): IAsignatura {
+    try {
+      for (const carreraData of carreras) {
+        for (const asignatura of carreraData.asignaturas) {
+          if (asignatura.nombre.toLowerCase() === nombre.toLowerCase()) {
+            // Retorna la asignatura completa con temas
+            return asignatura;
+          }
+        }
+      }
+
+      throw new ErrorManager({
+        type: 'NOT_FOUND',
+        message: 'Asignatura no encontrada',
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  // Método para obtener temas de una asignatura específica
+  getTemasByAsignatura(nombreAsignatura: string): ITema[] {
+    try {
+      for (const carreraData of carreras) {
+        for (const asignatura of carreraData.asignaturas) {
+          if (
+            asignatura.nombre.toLowerCase() === nombreAsignatura.toLowerCase()
+          ) {
+            return asignatura.temas;
+          }
+        }
+      }
+
+      throw new ErrorManager({
+        type: 'NOT_FOUND',
+        message: 'Asignatura no encontrada',
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
   }
 }
