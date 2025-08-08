@@ -160,8 +160,6 @@ export class UsuariosService {
       // Por defecto solo traer usuarios activos si no se especifica
       if (activo !== undefined) {
         queryBuilder.where('usuario.activo = :activo', { activo });
-      } else {
-        queryBuilder.where('usuario.activo = :activo', { activo: true });
       }
 
       if (search) {
