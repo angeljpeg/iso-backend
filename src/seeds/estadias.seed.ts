@@ -17,14 +17,20 @@ export async function seedEstadias(dataSource: DataSource) {
     where: { rol: RolUsuario.PROFESOR_TIEMPO_COMPLETO },
   });
 
-  console.log('🔍 Buscando profesor con rol:', RolUsuario.PROFESOR_TIEMPO_COMPLETO);
-  console.log('🔍 Profesor encontrado:', profesor ? `Sí (ID: ${profesor.id})` : 'No');
+  console.log(
+    '🔍 Buscando profesor con rol:',
+    RolUsuario.PROFESOR_TIEMPO_COMPLETO,
+  );
+  console.log(
+    '🔍 Profesor encontrado:',
+    profesor ? `Sí (ID: ${profesor.id})` : 'No',
+  );
 
   // Si no existe un profesor, crear uno
   if (!profesor) {
     console.log('No se encontró un profesor, creando uno nuevo...');
     const hashedPassword = await bcrypt.hash('ProfesorTC123!', 12);
-    
+
     const profesorData = {
       email: 'profesor.estadias@universidad.edu',
       password: hashedPassword,
@@ -35,16 +41,23 @@ export async function seedEstadias(dataSource: DataSource) {
       resetPasswordToken: null,
       resetPasswordExpires: null,
     };
-    
-    console.log('📝 Datos del profesor a crear:', { ...profesorData, password: '[HIDDEN]' });
-    
+
+    console.log('📝 Datos del profesor a crear:', {
+      ...profesorData,
+      password: '[HIDDEN]',
+    });
+
     profesor = usuarioRepository.create(profesorData);
     profesor = await usuarioRepository.save(profesor);
-    
-    console.log(`✅ Profesor creado: ${profesor.nombre} ${profesor.apellido} (${profesor.email})`);
+
+    console.log(
+      `✅ Profesor creado: ${profesor.nombre} ${profesor.apellido} (${profesor.email})`,
+    );
     console.log(`✅ ID del profesor: ${profesor.id}`);
   } else {
-    console.log(`✅ Usando profesor existente: ${profesor.nombre} ${profesor.apellido} (ID: ${profesor.id})`);
+    console.log(
+      `✅ Usando profesor existente: ${profesor.nombre} ${profesor.apellido} (ID: ${profesor.id})`,
+    );
   }
 
   // Verificar que el profesor tiene un ID válido
@@ -52,7 +65,9 @@ export async function seedEstadias(dataSource: DataSource) {
     throw new Error('No se pudo obtener un profesor válido con ID');
   }
 
-  console.log(`🔍 Profesor final a usar - ID: ${profesor.id}, Nombre: ${profesor.nombre} ${profesor.apellido}`);
+  console.log(
+    `🔍 Profesor final a usar - ID: ${profesor.id}, Nombre: ${profesor.nombre} ${profesor.apellido}`,
+  );
 
   // Crear estadías de ejemplo
   const estadias = [
@@ -64,33 +79,47 @@ export async function seedEstadias(dataSource: DataSource) {
     {
       profesorId: profesor.id,
       periodo: '2024-2',
-      observacionesGenerales: 'Estadías en inteligencia artificial y machine learning',
+      observacionesGenerales:
+        'Estadías en inteligencia artificial y machine learning',
     },
   ];
 
-  console.log('📝 Datos de estadías a crear:', estadias.map(e => ({ ...e, profesorId: e.profesorId })));
+  console.log(
+    '📝 Datos de estadías a crear:',
+    estadias.map((e) => ({ ...e, profesorId: e.profesorId })),
+  );
 
   const estadiasCreadas = [];
   for (const estadiaData of estadias) {
     console.log(`🔍 Creando estadía con profesorId: ${estadiaData.profesorId}`);
     const estadia = estadiaRepository.create(estadiaData);
-    console.log(`🔍 Estadía creada (antes de guardar):`, { id: estadia.id, profesorId: estadia.profesorId });
+    console.log(`🔍 Estadía creada (antes de guardar):`, {
+      id: estadia.id,
+      profesorId: estadia.profesorId,
+    });
     const estadiaGuardada = await estadiaRepository.save(estadia);
-    console.log(`✅ Estadía guardada:`, { id: estadiaGuardada.id, profesorId: estadiaGuardada.profesorId });
+    console.log(`✅ Estadía guardada:`, {
+      id: estadiaGuardada.id,
+      profesorId: estadiaGuardada.profesorId,
+    });
     estadiasCreadas.push(estadiaGuardada);
   }
 
   // Crear alumnos de ejemplo para la primera estadía
-  console.log('🔍 Estadías creadas:', estadiasCreadas.map(e => ({ id: e.id, profesorId: e.profesorId })));
+  console.log(
+    '🔍 Estadías creadas:',
+    estadiasCreadas.map((e) => ({ id: e.id, profesorId: e.profesorId })),
+  );
   console.log('🔍 Usando estadía ID para alumnos:', estadiasCreadas[0].id);
-  
+
   const alumnosEstadia1 = [
     {
       nombreAlumno: 'Ana Sofía García López',
       matricula: '2024001',
       carrera: 'Ingeniería en Sistemas Computacionales',
       estadiaId: estadiasCreadas[0].id,
-      observacionesGenerales: 'Alumna destacada con excelente capacidad de análisis',
+      observacionesGenerales:
+        'Alumna destacada con excelente capacidad de análisis',
     },
     {
       nombreAlumno: 'Carlos Eduardo Martínez',
@@ -108,21 +137,36 @@ export async function seedEstadias(dataSource: DataSource) {
     },
   ];
 
-  console.log('📝 Datos de alumnos a crear:', alumnosEstadia1.map(a => ({ nombre: a.nombreAlumno, estadiaId: a.estadiaId })));
+  console.log(
+    '📝 Datos de alumnos a crear:',
+    alumnosEstadia1.map((a) => ({
+      nombre: a.nombreAlumno,
+      estadiaId: a.estadiaId,
+    })),
+  );
 
   const alumnosCreados = [];
   for (const alumnoData of alumnosEstadia1) {
     console.log(`🔍 Creando alumno con estadiaId: ${alumnoData.estadiaId}`);
     const alumno = estadiaAlumnoRepository.create(alumnoData);
-    console.log(`🔍 Alumno creado (antes de guardar):`, { id: alumno.id, estadiaId: alumno.estadiaId });
+    console.log(`🔍 Alumno creado (antes de guardar):`, {
+      id: alumno.id,
+      estadiaId: alumno.estadiaId,
+    });
     const alumnoGuardado = await estadiaAlumnoRepository.save(alumno);
-    console.log(`✅ Alumno guardado:`, { id: alumnoGuardado.id, estadiaId: alumnoGuardado.estadiaId });
+    console.log(`✅ Alumno guardado:`, {
+      id: alumnoGuardado.id,
+      estadiaId: alumnoGuardado.estadiaId,
+    });
     alumnosCreados.push(alumnoGuardado);
   }
 
   // Crear progreso mensual de ejemplo
-  console.log('🔍 Alumnos creados:', alumnosCreados.map(a => ({ id: a.id, nombre: a.nombreAlumno })));
-  
+  console.log(
+    '🔍 Alumnos creados:',
+    alumnosCreados.map((a) => ({ id: a.id, nombre: a.nombreAlumno })),
+  );
+
   const progresosMensuales = [
     // Alumna 1 - Mes 1
     {
@@ -147,7 +191,8 @@ export async function seedEstadias(dataSource: DataSource) {
       estadiaAlumnoId: alumnosCreados[1].id,
       mes: 1,
       avance: 'no',
-      accionesTomadas: 'Se programaron sesiones de asesoría adicionales y se estableció un plan de trabajo más detallado',
+      accionesTomadas:
+        'Se programaron sesiones de asesoría adicionales y se estableció un plan de trabajo más detallado',
       fechaEvaluacion: new Date('2024-02-15'),
       observaciones: 'Necesita más orientación en la metodología del proyecto',
     },
@@ -171,22 +216,37 @@ export async function seedEstadias(dataSource: DataSource) {
     },
   ];
 
-  console.log('📝 Datos de progreso mensual a crear:', progresosMensuales.map(p => ({ 
-    estadiaAlumnoId: p.estadiaAlumnoId, 
-    mes: p.mes, 
-    avance: p.avance 
-  })));
+  console.log(
+    '📝 Datos de progreso mensual a crear:',
+    progresosMensuales.map((p) => ({
+      estadiaAlumnoId: p.estadiaAlumnoId,
+      mes: p.mes,
+      avance: p.avance,
+    })),
+  );
 
   for (const progresoData of progresosMensuales) {
-    console.log(`🔍 Creando progreso mensual con estadiaAlumnoId: ${progresoData.estadiaAlumnoId}`);
-    const progreso = progresoMensualRepository.create(progresoData as DeepPartial<ProgresoMensual>);
-    console.log(`🔍 Progreso creado (antes de guardar):`, { id: progreso.id, estadiaAlumnoId: progreso.estadiaAlumnoId });
+    console.log(
+      `🔍 Creando progreso mensual con estadiaAlumnoId: ${progresoData.estadiaAlumnoId}`,
+    );
+    const progreso = progresoMensualRepository.create(
+      progresoData as DeepPartial<ProgresoMensual>,
+    );
+    console.log(`🔍 Progreso creado (antes de guardar):`, {
+      id: progreso.id,
+      estadiaAlumnoId: progreso.estadiaAlumnoId,
+    });
     const progresoGuardado = await progresoMensualRepository.save(progreso);
-    console.log(`✅ Progreso guardado:`, { id: progresoGuardado.id, estadiaAlumnoId: progresoGuardado.estadiaAlumnoId });
+    console.log(`✅ Progreso guardado:`, {
+      id: progresoGuardado.id,
+      estadiaAlumnoId: progresoGuardado.estadiaAlumnoId,
+    });
   }
 
   console.log('✅ Datos de estadías sembrados correctamente');
   console.log(`   - ${estadiasCreadas.length} estadías creadas`);
   console.log(`   - ${alumnosCreados.length} alumnos registrados`);
-  console.log(`   - ${progresosMensuales.length} registros de progreso mensual`);
+  console.log(
+    `   - ${progresosMensuales.length} registros de progreso mensual`,
+  );
 }
