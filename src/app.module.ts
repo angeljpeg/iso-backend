@@ -8,6 +8,7 @@ import { GruposModule } from '@modules/Grupos/grupos.module';
 import { CuatrimestresModule } from './modules/Cuatrimestres/cuatrimestres.module';
 import { CargaAcademicaModule } from './modules/CargaAcademica/carga-academica.module';
 import { ProgramacionSeguimientoCursoModule } from '@modules/ProgramacionSeguimientoCurso/programacion-seguimiento-curso.module';
+import { EstadiasModule } from './modules/Estadias/estadias.module';
 
 @Module({
   imports: [
@@ -15,11 +16,11 @@ import { ProgramacionSeguimientoCursoModule } from '@modules/ProgramacionSeguimi
     UsuariosModule,
     AsignaturasModule,
     TemasModule,
-    UsuariosModule,
     GruposModule,
     CuatrimestresModule,
     CargaAcademicaModule,
     ProgramacionSeguimientoCursoModule,
+    EstadiasModule,
   ],
   controllers: [],
   providers: [],
