@@ -174,7 +174,8 @@ export class UsuariosService {
       }
 
       queryBuilder
-        .orderBy('usuario.nombre', 'ASC')
+        .orderBy('usuario.activo', 'DESC')
+        .addOrderBy('usuario.nombre', 'ASC')
         .addOrderBy('usuario.apellido', 'ASC');
 
       // Obtener el total de registros sin paginación
