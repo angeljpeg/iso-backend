@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
@@ -256,22 +256,38 @@ export class UsuariosService {
         });
       }
 
+      const emailExiste = await this.usuarioRepository.findOne({
+        where: { email: updateUsuarioDto.email, id: Not(id) },
+      });
+
+      if (emailExiste) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'El email ya está en uso',
+        });
+      }
+
       Object.assign(usuario, updateUsuarioDto);
       return await this.usuarioRepository.save(usuario);
     } catch (error) {
       if (error instanceof ErrorManager) {
         ErrorManager.createSignatureError(error.message);
       }
-      throw new ErrorManager({
-        type: 'INTERNAL_SERVER_ERROR',
-        message: 'Error al actualizar usuario',
-      });
+      console.log(error);
+      throw new InternalServerErrorException();
     }
   }
 
   async deactivate(id: string, deactivatedBy: Usuario): Promise<void> {
     try {
       const usuario = await this.findOne(id);
+
+      if (!usuario) {
+        throw new ErrorManager({
+          type: 'NOT_FOUND',
+          message: 'Usuario no encontrado',
+        });
+      }
 
       // Solo el coordinador puede desactivar usuarios
       if (deactivatedBy.rol !== RolUsuario.COORDINADOR) {
@@ -286,6 +302,13 @@ export class UsuariosService {
         throw new ErrorManager({
           type: 'FORBIDDEN',
           message: 'No puedes desactivar tu propia cuenta',
+        });
+      }
+
+      if (!usuario.activo) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'El usuario ya está desactivado',
         });
       }
 
@@ -305,6 +328,13 @@ export class UsuariosService {
   async reactivate(id: string, reactivatedBy: Usuario): Promise<void> {
     try {
       const usuario = await this.findOne(id);
+
+      if (!usuario) {
+        throw new ErrorManager({
+          type: 'NOT_FOUND',
+          message: 'Usuario no encontrado',
+        });
+      }
 
       // Solo el coordinador puede reactivar usuarios
       if (reactivatedBy.rol !== RolUsuario.COORDINADOR) {
