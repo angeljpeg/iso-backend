@@ -139,15 +139,16 @@ export class CargaAcademicaService {
     carrera?: string,
     asignatura?: string,
     activo?: boolean,
+    actual?: boolean,
     page?: number,
     limit?: number,
   ) {
     try {
       const queryBuilder = this.cargaAcademicaRepository
         .createQueryBuilder('carga')
-        .leftJoinAndSelect('carga.profesor', 'profesor')
-        .leftJoinAndSelect('carga.grupo', 'grupo')
-        .leftJoinAndSelect('grupo.cuatrimestreRelacion', 'cuatrimestre');
+        .innerJoinAndSelect('carga.profesor', 'profesor')
+        .innerJoinAndSelect('carga.grupo', 'grupo')
+        .innerJoinAndSelect('grupo.cuatrimestreRelacion', 'cuatrimestre');
 
       // Filtros
       if (profesorId) {
@@ -173,10 +174,20 @@ export class CargaAcademicaService {
       }
 
       if (activo !== undefined) {
+        console.log('activo has value: ', activo);
         queryBuilder.andWhere('carga.activo = :activo', { activo });
       } else {
-        // Por defecto, solo mostrar activos
-        queryBuilder.andWhere('carga.activo = true');
+        console.log('activo is undefined: ', activo);
+      }
+
+      if (actual !== undefined) {
+        if (actual) {
+          const fechaActual = new Date();
+          queryBuilder.andWhere(
+            'cuatrimestre.fechaInicio <= :fechaActual AND cuatrimestre.fechaFin >= :fechaActual',
+            { fechaActual },
+          );
+        }
       }
 
       // Ordenamiento
@@ -195,6 +206,7 @@ export class CargaAcademicaService {
 
       const [asignaciones, total] = await queryBuilder.getManyAndCount();
 
+      console.log('Asignaciones encontradas:', asignaciones.length);
       return {
         data: asignaciones,
         total,
@@ -203,6 +215,7 @@ export class CargaAcademicaService {
         totalPages: limit ? Math.ceil(total / limit) : 1,
       };
     } catch (error) {
+      console.error('Error en findAll:', error);
       if (error instanceof ErrorManager) {
         ErrorManager.createSignatureError(error.message);
       }

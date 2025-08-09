@@ -37,11 +37,11 @@ export class CargaAcademica {
   activo: boolean;
 
   // Relaciones
-  @ManyToOne(() => Usuario, { nullable: false, eager: true })
+  @ManyToOne(() => Usuario, { nullable: false })
   @JoinColumn({ name: 'profesor_id' })
   profesor: Usuario;
 
-  @ManyToOne(() => Grupo, { nullable: false, eager: true })
+  @ManyToOne(() => Grupo, { nullable: false })
   @JoinColumn({ name: 'grupo_id' })
   grupo: Grupo;
 

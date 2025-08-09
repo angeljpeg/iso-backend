@@ -81,6 +81,12 @@ export class CargaAcademicaController {
       'Filtrar por estado activo/inactivo. Por defecto solo trae activos.',
   })
   @ApiQuery({
+    name: 'actual',
+    required: false,
+    type: Boolean,
+    description: 'Traer solo las asignaciones del cuatrimestre actual.',
+  })
+  @ApiQuery({
     name: 'page',
     required: false,
     type: Number,
@@ -113,6 +119,7 @@ export class CargaAcademicaController {
     @Query('carrera') carrera?: string,
     @Query('asignatura') asignatura?: string,
     @Query('activo') activo?: string,
+    @Query('actual') actual?: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
@@ -122,7 +129,8 @@ export class CargaAcademicaController {
       grupoId,
       carrera,
       asignatura,
-      activo === 'true',
+      activo === undefined ? undefined : activo === 'true',
+      actual === undefined ? undefined : actual === 'true',
       page ? parseInt(page, 10) : undefined,
       limit ? parseInt(limit, 10) : undefined,
     );
