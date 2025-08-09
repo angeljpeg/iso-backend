@@ -185,4 +185,13 @@ export class GruposController {
   remove(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
     return this.gruposService.remove(id, req.user);
   }
+
+  @Get('carreras/all')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('jwt-auth')
+  @ApiOperation({ summary: 'Obtener carreras' })
+  @ApiResponse({ status: 200, description: 'Carreras obtenidas' })
+  getCarreras() {
+    return this.gruposService.getCarreras();
+  }
 }

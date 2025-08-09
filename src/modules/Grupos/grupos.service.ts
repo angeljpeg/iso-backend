@@ -368,4 +368,8 @@ export class GruposService {
       });
     }
   }
+
+  getCarreras() {
+    return carreras;
+  }
 }
