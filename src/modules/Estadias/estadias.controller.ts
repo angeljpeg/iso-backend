@@ -9,13 +9,13 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { 
-  ApiBearerAuth, 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
   ApiParam,
-  ApiBody 
+  ApiBody,
 } from '@nestjs/swagger';
 import { EstadiasService } from './estadias.service';
 import { CreateEstadiaDto } from './dto/create-estadia.dto';
@@ -37,20 +37,21 @@ export class EstadiasController {
 
   // Endpoint de prueba sin guards
   @Get('test')
-  @ApiOperation({ 
-    summary: 'Endpoint de prueba', 
-    description: 'Endpoint para verificar que el controlador de estadías esté funcionando correctamente' 
+  @ApiOperation({
+    summary: 'Endpoint de prueba',
+    description:
+      'Endpoint para verificar que el controlador de estadías esté funcionando correctamente',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Controlador funcionando correctamente',
     schema: {
       type: 'object',
       properties: {
         message: { type: 'string', example: 'Estadias controller working' },
-        timestamp: { type: 'string', format: 'date-time' }
-      }
-    }
+        timestamp: { type: 'string', format: 'date-time' },
+      },
+    },
   })
   test() {
     console.log('🧪 Test endpoint called - no guards');
@@ -62,13 +63,14 @@ export class EstadiasController {
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
-  @ApiOperation({ 
-    summary: 'Crear nueva estadía', 
-    description: 'Permite a los profesores crear una nueva estadía. El profesorId se asigna automáticamente del usuario autenticado.' 
+  @ApiOperation({
+    summary: 'Crear nueva estadía',
+    description:
+      'Permite a los profesores crear una nueva estadía. El profesorId se asigna automáticamente del usuario autenticado.',
   })
   @ApiBody({ type: CreateEstadiaDto })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Estadía creada exitosamente',
     schema: {
       type: 'object',
@@ -78,16 +80,29 @@ export class EstadiasController {
         periodo: { type: 'string', example: '2024-1' },
         observacionesGenerales: { type: 'string' },
         activo: { type: 'boolean', default: true },
-        profesor: { type: 'object', properties: { id: { type: 'string' }, nombre: { type: 'string' }, apellido: { type: 'string' } } },
+        profesor: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            nombre: { type: 'string' },
+            apellido: { type: 'string' },
+          },
+        },
         createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' }
-      }
-    }
+        updatedAt: { type: 'string', format: 'date-time' },
+      },
+    },
   })
   @ApiResponse({ status: 400, description: 'Datos de entrada inválidos' })
   @ApiResponse({ status: 401, description: 'No autorizado' })
-  @ApiResponse({ status: 403, description: 'Acceso denegado - Rol insuficiente' })
-  create(@Body() createEstadiaDto: CreateEstadiaDto, @Request() req: AuthenticatedRequest) {
+  @ApiResponse({
+    status: 403,
+    description: 'Acceso denegado - Rol insuficiente',
+  })
+  create(
+    @Body() createEstadiaDto: CreateEstadiaDto,
+    @Request() req: AuthenticatedRequest,
+  ) {
     // Asignar automáticamente el profesorId del usuario autenticado
     createEstadiaDto.profesorId = req.user.id;
     return this.estadiasService.create(createEstadiaDto);
@@ -97,12 +112,13 @@ export class EstadiasController {
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(RolUsuario.COORDINADOR, RolUsuario.MODERADOR)
-  @ApiOperation({ 
-    summary: 'Obtener todas las estadías', 
-    description: 'Permite a coordinadores y moderadores obtener todas las estadías activas del sistema.' 
+  @ApiOperation({
+    summary: 'Obtener todas las estadías',
+    description:
+      'Permite a coordinadores y moderadores obtener todas las estadías activas del sistema.',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Lista de estadías obtenida exitosamente',
     schema: {
       type: 'array',
@@ -116,13 +132,16 @@ export class EstadiasController {
           observacionesGenerales: { type: 'string' },
           activo: { type: 'boolean' },
           profesor: { type: 'object' },
-          alumnos: { type: 'array' }
-        }
-      }
-    }
+          alumnos: { type: 'array' },
+        },
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'No autorizado' })
-  @ApiResponse({ status: 403, description: 'Acceso denegado - Rol insuficiente' })
+  @ApiResponse({
+    status: 403,
+    description: 'Acceso denegado - Rol insuficiente',
+  })
   findAll(@Request() req: AuthenticatedRequest) {
     console.log('🔍 Usuario en findAll estadías:', req.user);
     return this.estadiasService.findAll();
@@ -132,12 +151,13 @@ export class EstadiasController {
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
-  @ApiOperation({ 
-    summary: 'Obtener estadías del profesor autenticado', 
-    description: 'Permite a los profesores obtener sus propias estadías. Se obtienen automáticamente basado en el usuario autenticado.' 
+  @ApiOperation({
+    summary: 'Obtener estadías del profesor autenticado',
+    description:
+      'Permite a los profesores obtener sus propias estadías. Se obtienen automáticamente basado en el usuario autenticado.',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Lista de estadías del profesor obtenida exitosamente',
     schema: {
       type: 'array',
@@ -151,13 +171,16 @@ export class EstadiasController {
           observacionesGenerales: { type: 'string' },
           activo: { type: 'boolean' },
           profesor: { type: 'object' },
-          alumnos: { type: 'array' }
-        }
-      }
-    }
+          alumnos: { type: 'array' },
+        },
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'No autorizado' })
-  @ApiResponse({ status: 403, description: 'Acceso denegado - Rol insuficiente' })
+  @ApiResponse({
+    status: 403,
+    description: 'Acceso denegado - Rol insuficiente',
+  })
   findByProfesor(@Request() req: AuthenticatedRequest) {
     console.log('🔍 Usuario en findByProfesor estadías:', req.user);
     return this.estadiasService.findByProfesor(req.user.id);
@@ -166,8 +189,17 @@ export class EstadiasController {
   @Get(':id')
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolUsuario.COORDINADOR, RolUsuario.MODERADOR, RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
-  @ApiOperation({ summary: 'Obtener estadía por ID', description: 'Obtiene una estadía específica con todos sus alumnos y progreso mensual.' })
+  @Roles(
+    RolUsuario.COORDINADOR,
+    RolUsuario.MODERADOR,
+    RolUsuario.PROFESOR_TIEMPO_COMPLETO,
+    RolUsuario.PROFESOR_ASIGNATURA,
+  )
+  @ApiOperation({
+    summary: 'Obtener estadía por ID',
+    description:
+      'Obtiene una estadía específica con todos sus alumnos y progreso mensual.',
+  })
   @ApiParam({ name: 'id', description: 'UUID de la estadía', type: 'string' })
   @ApiResponse({ status: 200, description: 'Estadía encontrada exitosamente' })
   @ApiResponse({ status: 404, description: 'Estadía no encontrada' })
@@ -181,8 +213,15 @@ export class EstadiasController {
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
-  @ApiOperation({ summary: 'Actualizar estadía', description: 'Permite a los profesores actualizar una estadía existente.' })
-  @ApiParam({ name: 'id', description: 'UUID de la estadía a actualizar', type: 'string' })
+  @ApiOperation({
+    summary: 'Actualizar estadía',
+    description: 'Permite a los profesores actualizar una estadía existente.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'UUID de la estadía a actualizar',
+    type: 'string',
+  })
   @ApiBody({ type: UpdateEstadiaDto })
   @ApiResponse({ status: 200, description: 'Estadía actualizada exitosamente' })
   @ApiResponse({ status: 404, description: 'Estadía no encontrada' })
@@ -197,7 +236,10 @@ export class EstadiasController {
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
-  @ApiOperation({ summary: 'Eliminar estadía', description: 'Elimina una estadía (soft delete)' })
+  @ApiOperation({
+    summary: 'Eliminar estadía',
+    description: 'Elimina una estadía (soft delete)',
+  })
   @ApiParam({ name: 'id', description: 'UUID de la estadía', type: 'string' })
   @ApiResponse({ status: 200, description: 'Estadía eliminada exitosamente' })
   @ApiResponse({ status: 404, description: 'Estadía no encontrada' })
@@ -210,7 +252,11 @@ export class EstadiasController {
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
-  @ApiOperation({ summary: 'Agregar alumno a estadía', description: 'Permite a los profesores agregar un nuevo alumno a una estadía.' })
+  @ApiOperation({
+    summary: 'Agregar alumno a estadía',
+    description:
+      'Permite a los profesores agregar un nuevo alumno a una estadía.',
+  })
   @ApiBody({ type: CreateEstadiaAlumnoDto })
   @ApiResponse({ status: 201, description: 'Alumno agregado exitosamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
@@ -222,8 +268,14 @@ export class EstadiasController {
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(RolUsuario.COORDINADOR, RolUsuario.MODERADOR)
-  @ApiOperation({ summary: 'Obtener todos los alumnos', description: 'Obtiene todos los alumnos de todas las estadías.' })
-  @ApiResponse({ status: 200, description: 'Lista de alumnos obtenida exitosamente' })
+  @ApiOperation({
+    summary: 'Obtener todos los alumnos',
+    description: 'Obtiene todos los alumnos de todas las estadías.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de alumnos obtenida exitosamente',
+  })
   findAllAlumnos() {
     return this.estadiasService.findAllAlumnos();
   }
@@ -231,10 +283,25 @@ export class EstadiasController {
   @Get('alumnos/estadia/:estadiaId')
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolUsuario.COORDINADOR, RolUsuario.MODERADOR, RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
-  @ApiOperation({ summary: 'Obtener alumnos por estadía', description: 'Obtiene todos los alumnos de una estadía específica.' })
-  @ApiParam({ name: 'estadiaId', description: 'UUID de la estadía', type: 'string' })
-  @ApiResponse({ status: 200, description: 'Lista de alumnos obtenida exitosamente' })
+  @Roles(
+    RolUsuario.COORDINADOR,
+    RolUsuario.MODERADOR,
+    RolUsuario.PROFESOR_TIEMPO_COMPLETO,
+    RolUsuario.PROFESOR_ASIGNATURA,
+  )
+  @ApiOperation({
+    summary: 'Obtener alumnos por estadía',
+    description: 'Obtiene todos los alumnos de una estadía específica.',
+  })
+  @ApiParam({
+    name: 'estadiaId',
+    description: 'UUID de la estadía',
+    type: 'string',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de alumnos obtenida exitosamente',
+  })
   findAlumnosByEstadia(@Param('estadiaId') estadiaId: string) {
     return this.estadiasService.findAlumnosByEstadia(estadiaId);
   }
@@ -242,7 +309,12 @@ export class EstadiasController {
   @Get('alumnos/:id')
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolUsuario.COORDINADOR, RolUsuario.MODERADOR, RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
+  @Roles(
+    RolUsuario.COORDINADOR,
+    RolUsuario.MODERADOR,
+    RolUsuario.PROFESOR_TIEMPO_COMPLETO,
+    RolUsuario.PROFESOR_ASIGNATURA,
+  )
   findAlumno(@Param('id') id: string) {
     return this.estadiasService.findAlumno(id);
   }
@@ -251,7 +323,10 @@ export class EstadiasController {
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
-  updateAlumno(@Param('id') id: string, @Body() updateEstadiaAlumnoDto: UpdateEstadiaAlumnoDto) {
+  updateAlumno(
+    @Param('id') id: string,
+    @Body() updateEstadiaAlumnoDto: UpdateEstadiaAlumnoDto,
+  ) {
     return this.estadiasService.updateAlumno(id, updateEstadiaAlumnoDto);
   }
 
@@ -268,10 +343,17 @@ export class EstadiasController {
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
-  @ApiOperation({ summary: 'Registrar progreso mensual', description: 'Permite a los profesores registrar el progreso mensual de un alumno.' })
+  @ApiOperation({
+    summary: 'Registrar progreso mensual',
+    description:
+      'Permite a los profesores registrar el progreso mensual de un alumno.',
+  })
   @ApiBody({ type: CreateProgresoMensualDto })
   @ApiResponse({ status: 201, description: 'Progreso registrado exitosamente' })
-  @ApiResponse({ status: 400, description: 'Ya existe progreso para este alumno en este mes' })
+  @ApiResponse({
+    status: 400,
+    description: 'Ya existe progreso para este alumno en este mes',
+  })
   createProgreso(@Body() createProgresoMensualDto: CreateProgresoMensualDto) {
     return this.estadiasService.createProgreso(createProgresoMensualDto);
   }
@@ -279,7 +361,12 @@ export class EstadiasController {
   @Get('progreso/alumno/:estadiaAlumnoId')
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolUsuario.COORDINADOR, RolUsuario.MODERADOR, RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
+  @Roles(
+    RolUsuario.COORDINADOR,
+    RolUsuario.MODERADOR,
+    RolUsuario.PROFESOR_TIEMPO_COMPLETO,
+    RolUsuario.PROFESOR_ASIGNATURA,
+  )
   findProgresoByAlumno(@Param('estadiaAlumnoId') estadiaAlumnoId: string) {
     return this.estadiasService.findProgresoByAlumno(estadiaAlumnoId);
   }
@@ -287,7 +374,12 @@ export class EstadiasController {
   @Get('progreso/:id')
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolUsuario.COORDINADOR, RolUsuario.MODERADOR, RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
+  @Roles(
+    RolUsuario.COORDINADOR,
+    RolUsuario.MODERADOR,
+    RolUsuario.PROFESOR_TIEMPO_COMPLETO,
+    RolUsuario.PROFESOR_ASIGNATURA,
+  )
   findProgreso(@Param('id') id: string) {
     return this.estadiasService.findProgreso(id);
   }
@@ -296,7 +388,10 @@ export class EstadiasController {
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
-  updateProgreso(@Param('id') id: string, @Body() updateProgresoMensualDto: UpdateProgresoMensualDto) {
+  updateProgreso(
+    @Param('id') id: string,
+    @Body() updateProgresoMensualDto: UpdateProgresoMensualDto,
+  ) {
     return this.estadiasService.updateProgreso(id, updateProgresoMensualDto);
   }
 
@@ -312,28 +407,38 @@ export class EstadiasController {
   @Get('reporte/:estadiaId')
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolUsuario.COORDINADOR, RolUsuario.MODERADOR, RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
-  @ApiOperation({ 
-    summary: 'Obtener reporte completo de estadía', 
-    description: 'Genera un reporte completo de una estadía incluyendo todos los alumnos y su progreso mensual. Ideal para evaluaciones y seguimiento.' 
+  @Roles(
+    RolUsuario.COORDINADOR,
+    RolUsuario.MODERADOR,
+    RolUsuario.PROFESOR_TIEMPO_COMPLETO,
+    RolUsuario.PROFESOR_ASIGNATURA,
+  )
+  @ApiOperation({
+    summary: 'Obtener reporte completo de estadía',
+    description:
+      'Genera un reporte completo de una estadía incluyendo todos los alumnos y su progreso mensual. Ideal para evaluaciones y seguimiento.',
   })
-  @ApiParam({ name: 'estadiaId', description: 'UUID de la estadía para generar el reporte', type: 'string' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiParam({
+    name: 'estadiaId',
+    description: 'UUID de la estadía para generar el reporte',
+    type: 'string',
+  })
+  @ApiResponse({
+    status: 200,
     description: 'Reporte generado exitosamente',
     schema: {
       type: 'object',
       properties: {
         id: { type: 'string', format: 'uuid' },
         periodo: { type: 'string' },
-        profesor: { 
+        profesor: {
           type: 'object',
           properties: {
             id: { type: 'string' },
             nombre: { type: 'string' },
             apellido: { type: 'string' },
-            email: { type: 'string' }
-          }
+            email: { type: 'string' },
+          },
         },
         alumnos: {
           type: 'array',
@@ -344,12 +449,12 @@ export class EstadiasController {
               nombreAlumno: { type: 'string' },
               matricula: { type: 'string' },
               carrera: { type: 'string' },
-              progresoMensual: { type: 'array' }
-            }
-          }
-        }
-      }
-    }
+              progresoMensual: { type: 'array' },
+            },
+          },
+        },
+      },
+    },
   })
   @ApiResponse({ status: 404, description: 'Estadía no encontrada' })
   @ApiResponse({ status: 401, description: 'No autorizado' })

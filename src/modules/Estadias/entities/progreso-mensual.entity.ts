@@ -26,9 +26,13 @@ export class ProgresoMensual {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => EstadiaAlumno, (estadiaAlumno) => estadiaAlumno.progresoMensual, {
-    nullable: false,
-  })
+  @ManyToOne(
+    () => EstadiaAlumno,
+    (estadiaAlumno) => estadiaAlumno.progresoMensual,
+    {
+      nullable: false,
+    },
+  )
   @JoinColumn({ name: 'estadia_alumno_id' })
   estadiaAlumno: EstadiaAlumno;
 

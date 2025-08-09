@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Estadia } from './entities/estadia.entity';
@@ -55,7 +59,10 @@ export class EstadiasService {
     return estadia;
   }
 
-  async update(id: string, updateEstadiaDto: UpdateEstadiaDto): Promise<Estadia> {
+  async update(
+    id: string,
+    updateEstadiaDto: UpdateEstadiaDto,
+  ): Promise<Estadia> {
     const estadia = await this.findOne(id);
     Object.assign(estadia, updateEstadiaDto);
     return await this.estadiaRepository.save(estadia);
@@ -68,8 +75,12 @@ export class EstadiasService {
   }
 
   // Métodos para Alumnos de Estadía
-  async createAlumno(createEstadiaAlumnoDto: CreateEstadiaAlumnoDto): Promise<EstadiaAlumno> {
-    const estadiaAlumno = this.estadiaAlumnoRepository.create(createEstadiaAlumnoDto);
+  async createAlumno(
+    createEstadiaAlumnoDto: CreateEstadiaAlumnoDto,
+  ): Promise<EstadiaAlumno> {
+    const estadiaAlumno = this.estadiaAlumnoRepository.create(
+      createEstadiaAlumnoDto,
+    );
     return await this.estadiaAlumnoRepository.save(estadiaAlumno);
   }
 
@@ -94,13 +105,18 @@ export class EstadiasService {
     });
 
     if (!alumno) {
-      throw new NotFoundException(`Alumno de estadía con ID ${id} no encontrado`);
+      throw new NotFoundException(
+        `Alumno de estadía con ID ${id} no encontrado`,
+      );
     }
 
     return alumno;
   }
 
-  async updateAlumno(id: string, updateEstadiaAlumnoDto: UpdateEstadiaAlumnoDto): Promise<EstadiaAlumno> {
+  async updateAlumno(
+    id: string,
+    updateEstadiaAlumnoDto: UpdateEstadiaAlumnoDto,
+  ): Promise<EstadiaAlumno> {
     const alumno = await this.findAlumno(id);
     Object.assign(alumno, updateEstadiaAlumnoDto);
     return await this.estadiaAlumnoRepository.save(alumno);
@@ -113,7 +129,9 @@ export class EstadiasService {
   }
 
   // Métodos para Progreso Mensual
-  async createProgreso(createProgresoMensualDto: CreateProgresoMensualDto): Promise<ProgresoMensual> {
+  async createProgreso(
+    createProgresoMensualDto: CreateProgresoMensualDto,
+  ): Promise<ProgresoMensual> {
     // Verificar que no exista ya un progreso para este alumno y mes
     const existingProgreso = await this.progresoMensualRepository.findOne({
       where: {
@@ -128,11 +146,15 @@ export class EstadiasService {
       );
     }
 
-    const progreso = this.progresoMensualRepository.create(createProgresoMensualDto);
+    const progreso = this.progresoMensualRepository.create(
+      createProgresoMensualDto,
+    );
     return await this.progresoMensualRepository.save(progreso);
   }
 
-  async findProgresoByAlumno(estadiaAlumnoId: string): Promise<ProgresoMensual[]> {
+  async findProgresoByAlumno(
+    estadiaAlumnoId: string,
+  ): Promise<ProgresoMensual[]> {
     return await this.progresoMensualRepository.find({
       where: { estadiaAlumnoId },
       relations: ['estadiaAlumno'],
@@ -147,13 +169,18 @@ export class EstadiasService {
     });
 
     if (!progreso) {
-      throw new NotFoundException(`Progreso mensual con ID ${id} no encontrado`);
+      throw new NotFoundException(
+        `Progreso mensual con ID ${id} no encontrado`,
+      );
     }
 
     return progreso;
   }
 
-  async updateProgreso(id: string, updateProgresoMensualDto: UpdateProgresoMensualDto): Promise<ProgresoMensual> {
+  async updateProgreso(
+    id: string,
+    updateProgresoMensualDto: UpdateProgresoMensualDto,
+  ): Promise<ProgresoMensual> {
     const progreso = await this.findProgreso(id);
     Object.assign(progreso, updateProgresoMensualDto);
     return await this.progresoMensualRepository.save(progreso);
@@ -168,11 +195,7 @@ export class EstadiasService {
   async getReporteEstadia(estadiaId: string) {
     const estadia = await this.estadiaRepository.findOne({
       where: { id: estadiaId, activo: true },
-      relations: [
-        'profesor',
-        'alumnos',
-        'alumnos.progresoMensual',
-      ],
+      relations: ['profesor', 'alumnos', 'alumnos.progresoMensual'],
     });
 
     if (!estadia) {
