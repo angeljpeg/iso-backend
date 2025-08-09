@@ -212,7 +212,7 @@ export class EstadiasController {
   @Patch(':id')
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
+  @Roles(RolUsuario.COORDINADOR)
   @ApiOperation({
     summary: 'Actualizar estadía',
     description: 'Permite a los profesores actualizar una estadía existente.',
@@ -235,7 +235,7 @@ export class EstadiasController {
   @Delete(':id')
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
+  @Roles(RolUsuario.COORDINADOR)
   @ApiOperation({
     summary: 'Eliminar estadía',
     description: 'Elimina una estadía (soft delete)',
@@ -322,7 +322,7 @@ export class EstadiasController {
   @Patch('alumnos/:id')
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
+  @Roles(RolUsuario.COORDINADOR)
   updateAlumno(
     @Param('id') id: string,
     @Body() updateEstadiaAlumnoDto: UpdateEstadiaAlumnoDto,
