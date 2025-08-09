@@ -62,7 +62,7 @@ export class EstadiasController {
   @Post()
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
+  @Roles(RolUsuario.COORDINADOR, RolUsuario.MODERADOR)
   @ApiOperation({
     summary: 'Crear nueva estadía',
     description:
@@ -99,12 +99,8 @@ export class EstadiasController {
     status: 403,
     description: 'Acceso denegado - Rol insuficiente',
   })
-  create(
-    @Body() createEstadiaDto: CreateEstadiaDto,
-    @Request() req: AuthenticatedRequest,
-  ) {
+  create(@Body() createEstadiaDto: CreateEstadiaDto) {
     // Asignar automáticamente el profesorId del usuario autenticado
-    createEstadiaDto.profesorId = req.user.id;
     return this.estadiasService.create(createEstadiaDto);
   }
 
