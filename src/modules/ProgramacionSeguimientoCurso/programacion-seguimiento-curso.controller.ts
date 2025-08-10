@@ -47,6 +47,7 @@ export class ProgramacionSeguimientoCursoController {
     @Body() createSeguimientoCursoDto: CreateSeguimientoCursoDto,
     @Request() req: AuthenticatedRequest,
   ) {
+    console.log('DTO: ', createSeguimientoCursoDto);
     return this.programacionSeguimientoCursoService.create(
       createSeguimientoCursoDto,
       req.user,

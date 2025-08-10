@@ -27,6 +27,9 @@ export class SeguimientoCurso {
   @Column({ type: 'uuid', name: 'carga_academica_id' })
   cargaAcademicaId: string;
 
+  @Column({ type: 'uuid', name: 'cuatrimestre_id' })
+  cuatrimestreId: string;
+
   @Column({
     type: 'enum',
     enum: EstadoSeguimiento,

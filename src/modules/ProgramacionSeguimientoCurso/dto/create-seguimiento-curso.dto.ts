@@ -7,6 +7,11 @@ export class CreateSeguimientoCursoDto {
   @IsNotEmpty()
   cargaAcademicaId: string;
 
+  @ApiProperty({ description: 'ID del cuatrimestre' })
+  @IsUUID()
+  @IsNotEmpty()
+  cuatrimestreId: string;
+
   @ApiPropertyOptional({ description: 'Fecha de Revision' })
   @IsDate()
   @IsOptional()

@@ -53,8 +53,11 @@ export class ProgramacionSeguimientoCursoService {
       const seguimientoCurso = this.seguimientoCursoRepository.create({
         ...createSeguimientoCursoDto,
       });
-
-      return await this.seguimientoCursoRepository.save(seguimientoCurso);
+      console.log('SeguimientoCurso: ', seguimientoCurso);
+      const seguimientoCursoSaved =
+        await this.seguimientoCursoRepository.save(seguimientoCurso);
+      console.log('SeguimientoCursoSaved: ', seguimientoCursoSaved);
+      return seguimientoCursoSaved;
     } catch (error) {
       // Manejo mejorado de errores
       if (
@@ -63,6 +66,7 @@ export class ProgramacionSeguimientoCursoService {
       ) {
         ErrorManager.createSignatureError(error.message);
       }
+      console.log(error);
       throw error;
     }
   }
@@ -89,7 +93,6 @@ export class ProgramacionSeguimientoCursoService {
         );
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const temaExists = getTemaByNombre(createDetalleDto.tema);
       if (!temaExists) {
         throw new BadRequestException('El tema especificado no existe');
