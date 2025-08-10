@@ -4,11 +4,17 @@ import { Usuario, RolUsuario } from '@modules/Usuarios/entities/usuario.entity';
 import { CargaAcademica } from '@modules/CargaAcademica/entities/carga-academica.entity';
 import { Grupo } from '@modules/Grupos/entities/grupo.entity'; // ✅ Agregar import
 import { getCarreraByCodigo } from '@lib/carreras';
+import {
+  EstadoSeguimiento,
+  SeguimientoCurso,
+} from '@modules/ProgramacionSeguimientoCurso/entities/seguimiento-curso.entity';
 
 export const profesor1 = async (dataSource: DataSource) => {
   try {
     const profesorRepository = dataSource.getRepository(Usuario);
     const cargaAcademicaRepository = dataSource.getRepository(CargaAcademica);
+    const seguimientoCursoRepository =
+      dataSource.getRepository(SeguimientoCurso);
     const grupoRepository = dataSource.getRepository(Grupo); // ✅ Agregar repository
 
     const carrera = getCarreraByCodigo('TIDS');
@@ -66,6 +72,7 @@ export const profesor1 = async (dataSource: DataSource) => {
       },
     ];
 
+    const savedCargasAcademicas: CargaAcademica[] = [];
     for (const cargaData of cargasAcademicas) {
       const grupo = await grupoRepository.findOne({
         where: { id: cargaData.grupoId },
@@ -95,11 +102,26 @@ export const profesor1 = async (dataSource: DataSource) => {
           cuatrimestreId: grupo.cuatrimestreId, // ✅ Incluir cuatrimestreId
         });
 
-        await cargaAcademicaRepository.save(cargaAcademica);
+        const savedCargaAcademica =
+          await cargaAcademicaRepository.save(cargaAcademica);
+        savedCargasAcademicas.push(savedCargaAcademica);
         console.log(
           `Carga académica creada: ${cargaData.asignatura} - Grupo: ${grupo.nombreGenerado}`,
         );
       }
+    }
+
+    for (const cargaAcademica of savedCargasAcademicas) {
+      const seguimientoCurso = seguimientoCursoRepository.create({
+        cargaAcademicaId: cargaAcademica.id,
+        cuatrimestreId: cargaAcademica.cuatrimestreId,
+        estado: EstadoSeguimiento.BORRADOR,
+      });
+
+      await seguimientoCursoRepository.save(seguimientoCurso);
+      console.log(
+        `Seguimiento de curso creado: ${cargaAcademica.asignatura} - Grupo: ${cargaAcademica.grupoId}`,
+      );
     }
   } catch (error) {
     console.error('Error creando profesor 1:', error);
