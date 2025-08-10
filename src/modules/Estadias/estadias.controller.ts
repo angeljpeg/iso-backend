@@ -247,7 +247,7 @@ export class EstadiasController {
   @Post('alumnos')
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
+  @Roles(RolUsuario.COORDINADOR, RolUsuario.MODERADOR)
   @ApiOperation({
     summary: 'Agregar alumno a estadía',
     description:
@@ -329,7 +329,7 @@ export class EstadiasController {
   @Delete('alumnos/:id')
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
+  @Roles(RolUsuario.COORDINADOR, RolUsuario.MODERADOR)
   removeAlumno(@Param('id') id: string) {
     return this.estadiasService.removeAlumno(id);
   }
