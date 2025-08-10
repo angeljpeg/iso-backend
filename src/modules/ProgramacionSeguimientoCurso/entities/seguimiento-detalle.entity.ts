@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { SeguimientoCurso } from './seguimiento-curso.entity';
 
@@ -14,6 +15,7 @@ export enum EstadoAvance {
   RETRASADO = 'retrasado',
 }
 
+@Index(['seguimientoCurso', 'tema'])
 @Entity('seguimiento_detalle')
 export class SeguimientoDetalle {
   @PrimaryGeneratedColumn('uuid')
