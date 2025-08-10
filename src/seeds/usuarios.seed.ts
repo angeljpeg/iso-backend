@@ -31,6 +31,14 @@ export const UsuariosSeed = async (dataSource: DataSource) => {
         activo: true,
       },
       {
+        email: 'juan.perez@universidad.edu',
+        password: 'Password123!',
+        nombre: 'María',
+        apellido: 'González',
+        rol: RolUsuario.COORDINADOR,
+        activo: true,
+      },
+      {
         email: 'moderador@universidad.edu',
         password: 'Moderador123!',
         nombre: 'Carlos',
