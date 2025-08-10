@@ -15,6 +15,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiQuery,
+  ApiParam,
 } from '@nestjs/swagger';
 import { ProgramacionSeguimientoCursoService } from './programacion-seguimiento-curso.service';
 import { CreateSeguimientoCursoDto } from './dto/create-seguimiento-curso.dto';
@@ -76,6 +77,18 @@ export class ProgramacionSeguimientoCursoController {
   @ApiResponse({ status: 404, description: 'Seguimiento no encontrado' })
   findOne(@Param('id') id: string) {
     return this.programacionSeguimientoCursoService.findOne(id);
+  }
+
+  @Get('cargaAcademica/:cargaAcademicaId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('jwt-auth')
+  @ApiParam({ name: 'cargaAcademicaId', required: true, type: String })
+  findOneByCargaAcademicaId(
+    @Param('cargaAcademicaId') cargaAcademicaId: string,
+  ) {
+    return this.programacionSeguimientoCursoService.findOneByCargaAcademicaId(
+      cargaAcademicaId,
+    );
   }
 
   @Patch(':id')

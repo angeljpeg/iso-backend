@@ -15,6 +15,7 @@ import { Usuario, RolUsuario } from '../Usuarios/entities/usuario.entity';
 import { CargaAcademica } from '../CargaAcademica/entities/carga-academica.entity';
 import { ErrorManager } from '@utils/error-manager';
 import { getTemaByNombre } from 'src/lib/carreras';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class ProgramacionSeguimientoCursoService {
@@ -120,6 +121,18 @@ export class ProgramacionSeguimientoCursoService {
   async findOne(id: string) {
     const seguimiento = await this.seguimientoCursoRepository.findOne({
       where: { id },
+      relations: ['detalles', 'cargaAcademica'],
+    });
+    if (!seguimiento)
+      throw new BadRequestException('Seguimiento no encontrado');
+    return seguimiento;
+  }
+
+  async findOneByCargaAcademicaId(cargaAcademicaId: string) {
+    if (!isUUID(cargaAcademicaId))
+      throw new BadRequestException('ID de carga académica inválido');
+    const seguimiento = await this.seguimientoCursoRepository.find({
+      where: { cargaAcademica: { id: cargaAcademicaId } },
       relations: ['detalles', 'cargaAcademica'],
     });
     if (!seguimiento)
