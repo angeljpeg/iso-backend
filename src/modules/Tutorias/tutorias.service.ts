@@ -64,7 +64,7 @@ export class TutoriasService {
     });
   }
 
-  async findOne(id: number): Promise<Tutoria> {
+  async findOne(id: string): Promise<Tutoria> {
     const tutoria = await this.tutoriaRepository.findOne({
       where: { id },
       relations: ['cargaAcademica', 'detalles'],
@@ -77,7 +77,7 @@ export class TutoriasService {
     return tutoria;
   }
 
-  async findByCargaAcademica(cargaAcademicaId: number): Promise<Tutoria[]> {
+  async findByCargaAcademica(cargaAcademicaId: string): Promise<Tutoria[]> {
     return await this.tutoriaRepository.find({
       where: { cargaAcademicaId },
       relations: ['cargaAcademica', 'detalles'],
@@ -86,7 +86,7 @@ export class TutoriasService {
   }
 
   async update(
-    id: number,
+    id: string,
     updateTutoriaDto: UpdateTutoriaDto,
   ): Promise<Tutoria> {
     const tutoria = await this.findOne(id);
@@ -111,7 +111,7 @@ export class TutoriasService {
   }
 
   async updateEstadoRevision(
-    id: number,
+    id: string,
     estadoRevision: EstadoRevision,
   ): Promise<Tutoria> {
     const tutoria = await this.findOne(id);
@@ -139,7 +139,7 @@ export class TutoriasService {
     return await this.tutoriaRepository.save(tutoria);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const tutoria = await this.findOne(id);
     await this.tutoriaRepository.remove(tutoria);
   }

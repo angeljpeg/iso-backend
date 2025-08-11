@@ -6,6 +6,7 @@ import {
   IsArray,
   MaxLength,
   ArrayMaxSize,
+  IsUUID,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -57,5 +58,8 @@ export class CreateTutoriaDto {
 
   @ApiProperty({ description: 'ID de la carga académica' })
   @IsNotEmpty()
-  cargaAcademicaId: number;
+  @IsUUID('4', {
+    message: 'El ID de la carga académica debe ser un UUID válido',
+  })
+  cargaAcademicaId: string;
 }

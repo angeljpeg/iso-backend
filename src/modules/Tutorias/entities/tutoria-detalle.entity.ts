@@ -47,8 +47,8 @@ export enum CausaBaja {
 
 @Entity('tutoria_detalles')
 export class TutoriaDetalle {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar', length: 100 })
   nombreAlumno: string;
@@ -95,8 +95,8 @@ export class TutoriaDetalle {
   @JoinColumn({ name: 'tutoriaId' })
   tutoria: Tutoria;
 
-  @Column()
-  tutoriaId: number;
+  @Column({ type: 'uuid' })
+  tutoriaId: string;
 
   @CreateDateColumn()
   createdAt: Date;

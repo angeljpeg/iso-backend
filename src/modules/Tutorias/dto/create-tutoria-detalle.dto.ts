@@ -4,7 +4,7 @@ import {
   IsEnum,
   IsBoolean,
   IsOptional,
-  IsNumber,
+  IsUUID,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
@@ -62,8 +62,13 @@ export class CreateTutoriaDetalleDto {
   @IsEnum(CausaBaja)
   causaBaja?: CausaBaja;
 
-  @ApiProperty({ description: 'ID de la tutoria' })
-  @IsNumber()
+  @ApiProperty({ 
+    description: 'ID de la tutoria',
+    type: 'string',
+    format: 'uuid',
+    example: 'uuid-de-tutoria'
+  })
+  @IsUUID('4', { message: 'El ID de la tutoria debe ser un UUID válido' })
   @IsNotEmpty()
-  tutoriaId: number;
+  tutoriaId: string;
 }

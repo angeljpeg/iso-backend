@@ -42,5 +42,5 @@ export class QueryTutoriaDto {
   @ApiPropertyOptional({ description: 'Filtrar por ID de carga académica' })
   @IsOptional()
   @IsNumber()
-  cargaAcademicaId?: number;
+  cargaAcademicaId?: string;
 }

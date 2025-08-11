@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -15,7 +16,9 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@guards/jwt-auth.guard';
 import { TutoriasService } from './tutorias.service';
 import { TutoriaDetallesService } from './tutoria-detalles.service';
 import {
@@ -29,6 +32,8 @@ import { Tutoria, TutoriaDetalle, EstadoRevision } from './entities';
 
 @ApiTags('Tutorias')
 @Controller('tutorias')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('jwt-auth')
 export class TutoriasController {
   constructor(
     private readonly tutoriasService: TutoriasService,
@@ -112,6 +117,9 @@ export class TutoriasController {
   @ApiParam({
     name: 'cargaAcademicaId',
     description: 'ID de la carga académica',
+    type: 'string',
+    format: 'uuid',
+    example: 'uuid-de-carga-academica',
   })
   @ApiResponse({
     status: 200,
@@ -119,27 +127,39 @@ export class TutoriasController {
     type: [Tutoria],
   })
   findByCargaAcademica(
-    @Param('cargaAcademicaId', ParseIntPipe) cargaAcademicaId: number,
+    @Param('cargaAcademicaId') cargaAcademicaId: string,
   ): Promise<Tutoria[]> {
     return this.tutoriasService.findByCargaAcademica(cargaAcademicaId);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener una tutoria por ID' })
-  @ApiParam({ name: 'id', description: 'ID de la tutoria' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID de la tutoria',
+    type: 'string',
+    format: 'uuid',
+    example: 'uuid-de-tutoria',
+  })
   @ApiResponse({
     status: 200,
     description: 'Tutoria obtenida exitosamente',
     type: Tutoria,
   })
   @ApiResponse({ status: 404, description: 'Tutoria no encontrada' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Tutoria> {
+  findOne(@Param('id') id: string): Promise<Tutoria> {
     return this.tutoriasService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar una tutoria' })
-  @ApiParam({ name: 'id', description: 'ID de la tutoria' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID de la tutoria',
+    type: 'string',
+    format: 'uuid',
+    example: 'uuid-de-tutoria',
+  })
   @ApiResponse({
     status: 200,
     description: 'Tutoria actualizada exitosamente',
@@ -148,7 +168,7 @@ export class TutoriasController {
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiResponse({ status: 404, description: 'Tutoria no encontrada' })
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateTutoriaDto: UpdateTutoriaDto,
   ): Promise<Tutoria> {
     return this.tutoriasService.update(id, updateTutoriaDto);
@@ -156,7 +176,13 @@ export class TutoriasController {
 
   @Patch(':id/estado-revision')
   @ApiOperation({ summary: 'Actualizar estado de revisión de una tutoria' })
-  @ApiParam({ name: 'id', description: 'ID de la tutoria' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID de la tutoria',
+    type: 'string',
+    format: 'uuid',
+    example: 'uuid-de-tutoria',
+  })
   @ApiResponse({
     status: 200,
     description: 'Estado de revisión actualizado exitosamente',
@@ -165,7 +191,7 @@ export class TutoriasController {
   @ApiResponse({ status: 400, description: 'Transición de estado inválida' })
   @ApiResponse({ status: 404, description: 'Tutoria no encontrada' })
   updateEstadoRevision(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body('estadoRevision') estadoRevision: EstadoRevision,
   ): Promise<Tutoria> {
     return this.tutoriasService.updateEstadoRevision(id, estadoRevision);
@@ -173,17 +199,29 @@ export class TutoriasController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar una tutoria' })
-  @ApiParam({ name: 'id', description: 'ID de la tutoria' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID de la tutoria',
+    type: 'string',
+    format: 'uuid',
+    example: 'uuid-de-tutoria',
+  })
   @ApiResponse({ status: 200, description: 'Tutoria eliminada exitosamente' })
   @ApiResponse({ status: 404, description: 'Tutoria no encontrada' })
-  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  remove(@Param('id') id: string): Promise<void> {
     return this.tutoriasService.remove(id);
   }
 
   // Endpoints para detalles de tutoria
   @Post(':id/detalles')
   @ApiOperation({ summary: 'Crear un detalle de tutoria' })
-  @ApiParam({ name: 'id', description: 'ID de la tutoria' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID de la tutoria',
+    type: 'string',
+    format: 'uuid',
+    example: 'uuid-de-tutoria',
+  })
   @ApiResponse({
     status: 201,
     description: 'Detalle de tutoria creado exitosamente',
@@ -191,7 +229,7 @@ export class TutoriasController {
   })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   createDetalle(
-    @Param('id', ParseIntPipe) tutoriaId: number,
+    @Param('id') tutoriaId: string,
     @Body() createDetalleDto: CreateTutoriaDetalleDto,
   ): Promise<TutoriaDetalle> {
     return this.tutoriaDetallesService.create({
@@ -202,21 +240,33 @@ export class TutoriasController {
 
   @Get(':id/detalles')
   @ApiOperation({ summary: 'Obtener detalles de una tutoria' })
-  @ApiParam({ name: 'id', description: 'ID de la tutoria' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID de la tutoria',
+    type: 'string',
+    format: 'uuid',
+    example: 'uuid-de-tutoria',
+  })
   @ApiResponse({
     status: 200,
     description: 'Detalles de la tutoria obtenidos exitosamente',
     type: [TutoriaDetalle],
   })
   getDetalles(
-    @Param('id', ParseIntPipe) tutoriaId: number,
+    @Param('id') tutoriaId: string,
   ): Promise<TutoriaDetalle[]> {
     return this.tutoriaDetallesService.findByTutoria(tutoriaId);
   }
 
   @Get('detalles/:detalleId')
   @ApiOperation({ summary: 'Obtener un detalle de tutoria por ID' })
-  @ApiParam({ name: 'detalleId', description: 'ID del detalle' })
+  @ApiParam({
+    name: 'detalleId',
+    description: 'ID del detalle',
+    type: 'string',
+    format: 'uuid',
+    example: 'uuid-de-detalle',
+  })
   @ApiResponse({
     status: 200,
     description: 'Detalle de tutoria obtenido exitosamente',
@@ -224,14 +274,20 @@ export class TutoriasController {
   })
   @ApiResponse({ status: 404, description: 'Detalle no encontrado' })
   getDetalle(
-    @Param('detalleId', ParseIntPipe) detalleId: number,
+    @Param('detalleId') detalleId: string,
   ): Promise<TutoriaDetalle> {
     return this.tutoriaDetallesService.findOne(detalleId);
   }
 
   @Patch('detalles/:detalleId')
   @ApiOperation({ summary: 'Actualizar un detalle de tutoria' })
-  @ApiParam({ name: 'detalleId', description: 'ID del detalle' })
+  @ApiParam({
+    name: 'detalleId',
+    description: 'ID del detalle',
+    type: 'string',
+    format: 'uuid',
+    example: 'uuid-de-detalle',
+  })
   @ApiResponse({
     status: 200,
     description: 'Detalle de tutoria actualizado exitosamente',
@@ -240,7 +296,7 @@ export class TutoriasController {
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiResponse({ status: 404, description: 'Detalle no encontrado' })
   updateDetalle(
-    @Param('detalleId', ParseIntPipe) detalleId: number,
+    @Param('detalleId') detalleId: string,
     @Body() updateDetalleDto: UpdateTutoriaDetalleDto,
   ): Promise<TutoriaDetalle> {
     return this.tutoriaDetallesService.update(detalleId, updateDetalleDto);
@@ -248,11 +304,17 @@ export class TutoriasController {
 
   @Delete('detalles/:detalleId')
   @ApiOperation({ summary: 'Eliminar un detalle de tutoria' })
-  @ApiParam({ name: 'detalleId', description: 'ID del detalle' })
+  @ApiParam({
+    name: 'detalleId',
+    description: 'ID del detalle',
+    type: 'string',
+    format: 'uuid',
+    example: 'uuid-de-detalle',
+  })
   @ApiResponse({ status: 200, description: 'Detalle eliminado exitosamente' })
   @ApiResponse({ status: 404, description: 'Detalle no encontrado' })
   removeDetalle(
-    @Param('detalleId', ParseIntPipe) detalleId: number,
+    @Param('detalleId') detalleId: string,
   ): Promise<void> {
     return this.tutoriaDetallesService.remove(detalleId);
   }

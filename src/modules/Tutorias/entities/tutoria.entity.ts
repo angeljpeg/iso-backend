@@ -26,8 +26,8 @@ export enum EstadoRevision {
 
 @Entity('tutorias')
 export class Tutoria {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar', length: 100 })
   cuatrimestre: string;
@@ -71,8 +71,8 @@ export class Tutoria {
   @JoinColumn({ name: 'cargaAcademicaId' })
   cargaAcademica: CargaAcademica;
 
-  @Column()
-  cargaAcademicaId: number;
+  @Column({ type: 'uuid' })
+  cargaAcademicaId: string;
 
   @OneToMany(() => TutoriaDetalle, (detalle) => detalle.tutoria, {
     cascade: true,
