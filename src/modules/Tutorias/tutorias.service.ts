@@ -93,7 +93,7 @@ export class TutoriasService {
 
     // Validar que no se pueda cambiar el estado a completado si hay detalles sin completar
     if (
-      updateTutoriaDto.estado === EstadoProfesor.COMPLETADO &&
+      tutoria.estado === EstadoProfesor.COMPLETADO &&
       tutoria.detalles?.some((detalle) => !detalle.fueAtendido)
     ) {
       throw new BadRequestException(
@@ -101,14 +101,9 @@ export class TutoriasService {
       );
     }
 
-    // Si se está marcando como completada, actualizar fecha de revisión
-    if (updateTutoriaDto.estado === EstadoProfesor.COMPLETADO) {
-      updateTutoriaDto.fechaRevision = new Date();
-    }
-
     // Convertir fecha si se proporciona
     if (updateTutoriaDto.fecha) {
-      updateTutoriaDto.fecha = new Date(updateTutoriaDto.fecha);
+      updateTutoriaDto.fecha = new Date(updateTutoriaDto.fecha).toISOString();
     }
 
     Object.assign(tutoria, updateTutoriaDto);

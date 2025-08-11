@@ -139,6 +139,7 @@ export class CargaAcademicaService {
     carrera?: string,
     asignatura?: string,
     activo?: boolean,
+    esTutor?: boolean,
     actual?: boolean,
     page?: number,
     limit?: number,
@@ -178,6 +179,10 @@ export class CargaAcademicaService {
         queryBuilder.andWhere('carga.activo = :activo', { activo });
       } else {
         console.log('activo is undefined: ', activo);
+      }
+
+      if (esTutor !== undefined) {
+        queryBuilder.andWhere('carga.esTutor = :esTutor', { esTutor });
       }
 
       if (actual !== undefined) {

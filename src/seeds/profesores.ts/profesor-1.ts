@@ -100,6 +100,7 @@ export const profesor1 = async (dataSource: DataSource) => {
           asignatura: cargaData.asignatura,
           grupoId: cargaData.grupoId, // ✅ Incluir grupoId
           cuatrimestreId: grupo.cuatrimestreId, // ✅ Incluir cuatrimestreId
+          esTutor: false, // ✅ Incluir esTutor con valor por defecto
         });
 
         const savedCargaAcademica =

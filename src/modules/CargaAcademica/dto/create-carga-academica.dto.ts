@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsUUID, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsUUID, IsString, MaxLength, IsBoolean, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCargaAcademicaDto {
@@ -47,5 +47,7 @@ export class CreateCargaAcademicaDto {
     description: 'Indica si el profesor es tutor del grupo',
     default: false,
   })
+  @IsOptional()
+  @IsBoolean({ message: 'esTutor debe ser un valor booleano' })
   esTutor?: boolean;
 }
