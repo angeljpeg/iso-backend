@@ -37,6 +37,9 @@ export class CargaAcademica {
   @Column({ default: true })
   activo: boolean;
 
+  @Column({ default: false, name: 'es_tutor' })
+  esTutor: boolean;
+
   // Relaciones
   @ManyToOne(() => Usuario, { nullable: false })
   @JoinColumn({ name: 'profesor_id' })

@@ -41,4 +41,11 @@ export class CreateCargaAcademicaDto {
   @IsNotEmpty({ message: 'El ID del grupo es obligatorio' })
   @IsUUID('4', { message: 'El ID del grupo debe ser un UUID válido' })
   grupoId: string;
+
+  @ApiProperty({
+    example: false,
+    description: 'Indica si el profesor es tutor del grupo',
+    default: false,
+  })
+  esTutor?: boolean;
 }

@@ -6,7 +6,8 @@
 - Nombre del Tutor
 - Grupo
 - Carrera
-- Fecha
+- Fecha (terminado)
+- Fecha (revision)
 
 - Nombre del Alumnos
 - Vulnerabilidad
@@ -55,6 +56,19 @@
 9. Cambio de carrera.
 10. Faltas al reglamento escolar.
 11. Otras causas ( específique en Observaciones)
+
+- estado (profesor):
+
+1. en progreso
+2. completado
+
+- estado revision (coordinador):
+
+1. sin revisar
+2. revisado
+3. revisando
+4. aceptado
+5. rechazado
 
 ## Reglas
 

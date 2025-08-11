@@ -10,6 +10,7 @@ import { CargaAcademicaModule } from './modules/CargaAcademica/carga-academica.m
 import { ProgramacionSeguimientoCursoModule } from '@modules/ProgramacionSeguimientoCurso/programacion-seguimiento-curso.module';
 import { EstadiasModule } from './modules/Estadias/estadias.module';
 import { AsesoriasModule } from '@modules/Asesorias/asesorias.module';
+import { TutoriasModule } from './modules/Tutorias/tutorias.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AsesoriasModule } from '@modules/Asesorias/asesorias.module';
     ProgramacionSeguimientoCursoModule,
     EstadiasModule,
     AsesoriasModule,
+    TutoriasModule,
   ],
   controllers: [],
   providers: [],
