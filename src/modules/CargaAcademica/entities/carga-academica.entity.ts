@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Usuario } from '../../Usuarios/entities/usuario.entity';
 import { Grupo } from '../../Grupos/entities/grupo.entity';
+import { Cuatrimestre } from '../../Cuatrimestres/entities/cuatrimestre.entity';
 
 @Entity('carga_academica')
 @Index(['profesorId', 'grupoId', 'carrera', 'asignatura'], { unique: true }) // Validación: no puede haber asignación duplicada
@@ -44,6 +45,10 @@ export class CargaAcademica {
   @ManyToOne(() => Grupo, { nullable: false })
   @JoinColumn({ name: 'grupo_id' })
   grupo: Grupo;
+
+  @ManyToOne(() => Cuatrimestre, { nullable: false })
+  @JoinColumn({ name: 'cuatrimestre_id' })
+  cuatrimestre: Cuatrimestre;
 
   @CreateDateColumn()
   createdAt: Date;

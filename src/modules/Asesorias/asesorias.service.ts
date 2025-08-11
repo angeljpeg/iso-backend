@@ -17,6 +17,55 @@ export class AsesoriasService {
     private readonly cargaAcademicaService: CargaAcademicaService,
   ) {}
 
+  // Método de prueba temporal para debuggear
+  async testRelations(): Promise<any> {
+    try {
+      console.log('Probando relaciones básicas...');
+
+      // Consulta simple sin JOINs complejos
+      const asesorias = await this.asesoriaRepository.find({
+        where: { activo: true },
+        take: 1,
+      });
+
+      console.log('Asesorías encontradas (sin relaciones):', asesorias.length);
+
+      if (asesorias.length > 0) {
+        const asesoria = asesorias[0];
+        console.log('Primera asesoría:', {
+          id: asesoria.id,
+          temaAsesoria: asesoria.temaAsesoria,
+          cargaAcademicaId: asesoria.cargaAcademicaId,
+        });
+
+        // Intentar cargar relaciones una por una
+        const asesoriaConRelaciones = await this.asesoriaRepository.findOne({
+          where: { id: asesoria.id },
+          relations: ['cargaAcademica'],
+        });
+
+        console.log(
+          'Asesoría con carga académica:',
+          asesoriaConRelaciones?.cargaAcademica ? 'OK' : 'ERROR',
+        );
+
+        if (asesoriaConRelaciones?.cargaAcademica) {
+          const cargaAcademica = asesoriaConRelaciones.cargaAcademica;
+          console.log('Carga académica:', {
+            id: cargaAcademica.id,
+            carrera: cargaAcademica.carrera,
+            asignatura: cargaAcademica.asignatura,
+          });
+        }
+      }
+
+      return { success: true, message: 'Prueba de relaciones completada' };
+    } catch (error) {
+      console.error('Error en prueba de relaciones:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
   async create(
     createAsesoriaDto: CreateAsesoriaDto,
     createdBy: Usuario,
@@ -77,6 +126,18 @@ export class AsesoriasService {
     limit: number = 10,
   ): Promise<AsesoriaResponseDto> {
     try {
+      console.log('Iniciando findAll asesorías con parámetros:', {
+        profesorNombre,
+        cuatrimestreNombre,
+        grupoNombre,
+        temaNombre,
+        asignaturaNombre,
+        carreraNombre,
+        cuatrimestreActual,
+        page,
+        limit,
+      });
+
       const queryBuilder = this.asesoriaRepository
         .createQueryBuilder('asesoria')
         .leftJoinAndSelect('asesoria.cargaAcademica', 'cargaAcademica')
@@ -84,6 +145,8 @@ export class AsesoriasService {
         .leftJoinAndSelect('cargaAcademica.grupo', 'grupo')
         .leftJoinAndSelect('cargaAcademica.cuatrimestre', 'cuatrimestre')
         .where('asesoria.activo = :activo', { activo: true });
+
+      console.log('QueryBuilder creado, aplicando filtros...');
 
       // Filtros de búsqueda
       if (profesorNombre) {
@@ -93,13 +156,16 @@ export class AsesoriasService {
       }
 
       if (cuatrimestreNombre) {
-        queryBuilder.andWhere('cuatrimestre.nombre ILIKE :cuatrimestreNombre', {
-          cuatrimestreNombre: `%${cuatrimestreNombre}%`,
-        });
+        queryBuilder.andWhere(
+          'cuatrimestre.nombreGenerado ILIKE :cuatrimestreNombre',
+          {
+            cuatrimestreNombre: `%${cuatrimestreNombre}%`,
+          },
+        );
       }
 
       if (grupoNombre) {
-        queryBuilder.andWhere('grupo.nombre ILIKE :grupoNombre', {
+        queryBuilder.andWhere('grupo.nombreGenerado ILIKE :grupoNombre', {
           grupoNombre: `%${grupoNombre}%`,
         });
       }
@@ -131,13 +197,19 @@ export class AsesoriasService {
         });
       }
 
+      console.log('Filtros aplicados, ejecutando consulta...');
+
       // Paginación
       const total = await queryBuilder.getCount();
+      console.log('Total de registros encontrados:', total);
+
       const data = await queryBuilder
         .skip((page - 1) * limit)
         .take(limit)
         .orderBy('asesoria.fecha', 'DESC')
         .getMany();
+
+      console.log('Datos obtenidos exitosamente, cantidad:', data.length);
 
       return {
         data,
@@ -146,6 +218,7 @@ export class AsesoriasService {
         limit,
       };
     } catch (error) {
+      console.error('Error en findAll asesorías:', error);
       if (error instanceof ErrorManager) {
         ErrorManager.createSignatureError(error.message);
       }
@@ -174,6 +247,7 @@ export class AsesoriasService {
 
       return asesoria;
     } catch (error) {
+      console.error('Error en findOne asesorías:', error);
       if (error instanceof ErrorManager) {
         ErrorManager.createSignatureError(error.message);
       }
@@ -183,7 +257,12 @@ export class AsesoriasService {
 
   async findByCargaAcademicaId(cargaAcademicaId: string): Promise<Asesoria[]> {
     try {
-      return await this.asesoriaRepository.find({
+      console.log(
+        'Buscando asesorías para carga académica ID:',
+        cargaAcademicaId,
+      );
+
+      const result = await this.asesoriaRepository.find({
         where: { cargaAcademicaId, activo: true },
         relations: [
           'cargaAcademica',
@@ -193,7 +272,11 @@ export class AsesoriasService {
         ],
         order: { fecha: 'DESC' },
       });
+
+      console.log('Asesorías encontradas:', result.length);
+      return result;
     } catch (error) {
+      console.error('Error en findByCargaAcademicaId asesorías:', error);
       if (error instanceof ErrorManager) {
         ErrorManager.createSignatureError(error.message);
       }

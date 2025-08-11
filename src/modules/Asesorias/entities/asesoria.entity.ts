@@ -38,7 +38,7 @@ export class Asesoria {
   activo: boolean;
 
   // Relaciones
-  @ManyToOne(() => CargaAcademica, { nullable: false, eager: true })
+  @ManyToOne(() => CargaAcademica, { nullable: false, eager: false })
   @JoinColumn({ name: 'carga_academica_id' })
   cargaAcademica: CargaAcademica;
 

@@ -67,6 +67,26 @@ export class AsesoriasController {
     return this.asesoriasService.create(createAsesoriaDto, req.user);
   }
 
+  @Get('test-relations')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('jwt-auth')
+  @ApiOperation({
+    summary: 'Probar relaciones (temporal)',
+    description:
+      'Endpoint temporal para probar que las relaciones funcionen correctamente.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Prueba de relaciones completada',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno del servidor',
+  })
+  testRelations(): Promise<any> {
+    return this.asesoriasService.testRelations();
+  }
+
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('jwt-auth')

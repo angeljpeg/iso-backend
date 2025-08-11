@@ -4,9 +4,22 @@ import { AsesoriasService } from './asesorias.service';
 import { AsesoriasController } from './asesorias.controller';
 import { Asesoria } from './entities/asesoria.entity';
 import { CargaAcademicaModule } from '../CargaAcademica/carga-academica.module';
+import { CargaAcademica } from '../CargaAcademica/entities/carga-academica.entity';
+import { Usuario } from '../Usuarios/entities/usuario.entity';
+import { Grupo } from '../Grupos/entities/grupo.entity';
+import { Cuatrimestre } from '../Cuatrimestres/entities/cuatrimestre.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Asesoria]), CargaAcademicaModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      Asesoria,
+      CargaAcademica,
+      Usuario,
+      Grupo,
+      Cuatrimestre,
+    ]),
+    CargaAcademicaModule,
+  ],
   controllers: [AsesoriasController],
   providers: [AsesoriasService],
   exports: [AsesoriasService],
