@@ -45,7 +45,6 @@ export class ReportesSeguimientoService {
         .createQueryBuilder('sc')
         .leftJoinAndSelect('sc.cargaAcademica', 'ca')
         .leftJoinAndSelect('ca.profesor', 'prof')
-        .leftJoinAndSelect('ca.asignatura', 'asig')
         .leftJoinAndSelect('ca.grupo', 'grupo')
         .leftJoinAndSelect('sc.cuatrimestre', 'cuat')
         .leftJoinAndSelect('sc.revisadoPor', 'rev')
@@ -105,7 +104,6 @@ export class ReportesSeguimientoService {
         .leftJoinAndSelect('det.seguimientoCurso', 'sc')
         .leftJoinAndSelect('sc.cargaAcademica', 'ca')
         .leftJoinAndSelect('ca.profesor', 'prof')
-        .leftJoinAndSelect('ca.asignatura', 'asig')
         .leftJoinAndSelect('ca.grupo', 'grupo')
         .leftJoinAndSelect('sc.cuatrimestre', 'cuat');
 
@@ -159,8 +157,7 @@ export class ReportesSeguimientoService {
         .createQueryBuilder('not')
         .leftJoinAndSelect('not.usuario', 'usr')
         .leftJoinAndSelect('not.seguimientoCurso', 'sc')
-        .leftJoinAndSelect('sc.cargaAcademica', 'ca')
-        .leftJoinAndSelect('ca.asignatura', 'asig');
+        .leftJoinAndSelect('sc.cargaAcademica', 'ca');
 
       this.aplicarFiltrosNotificaciones(queryBuilder, filtros);
 
@@ -212,7 +209,6 @@ export class ReportesSeguimientoService {
         .createQueryBuilder('sc')
         .leftJoinAndSelect('sc.cargaAcademica', 'ca')
         .leftJoinAndSelect('ca.profesor', 'prof')
-        .leftJoinAndSelect('ca.asignatura', 'asig')
         .leftJoinAndSelect('ca.grupo', 'grupo')
         .leftJoinAndSelect('sc.cuatrimestre', 'cuat')
         .leftJoinAndSelect('sc.detalles', 'det');
@@ -260,7 +256,6 @@ export class ReportesSeguimientoService {
         .leftJoinAndSelect('det.seguimientoCurso', 'sc')
         .leftJoinAndSelect('sc.cargaAcademica', 'ca')
         .leftJoinAndSelect('ca.profesor', 'prof')
-        .leftJoinAndSelect('ca.asignatura', 'asig')
         .leftJoinAndSelect('ca.grupo', 'grupo')
         .leftJoinAndSelect('sc.cuatrimestre', 'cuat')
         .where('det.retraso = :retraso', { retraso: true });
@@ -319,7 +314,6 @@ export class ReportesSeguimientoService {
         .createQueryBuilder('sc')
         .leftJoinAndSelect('sc.cargaAcademica', 'ca')
         .leftJoinAndSelect('ca.profesor', 'prof')
-        .leftJoinAndSelect('ca.asignatura', 'asig')
         .leftJoinAndSelect('ca.grupo', 'grupo')
         .leftJoinAndSelect('sc.cuatrimestre', 'cuat')
         .leftJoinAndSelect('sc.detalles', 'det');
@@ -402,9 +396,9 @@ export class ReportesSeguimientoService {
       });
     }
 
-    if (filtros.asignaturaId) {
-      queryBuilder.andWhere('ca.asignaturaId = :asignaturaId', {
-        asignaturaId: filtros.asignaturaId,
+    if (filtros.asignatura) {
+      queryBuilder.andWhere('ca.asignatura ILIKE :asignatura', {
+        asignatura: `%${filtros.asignatura}%`,
       });
     }
 
@@ -467,9 +461,9 @@ export class ReportesSeguimientoService {
       });
     }
 
-    if (filtros.asignaturaId) {
-      queryBuilder.andWhere('ca.asignaturaId = :asignaturaId', {
-        asignaturaId: filtros.asignaturaId,
+    if (filtros.asignatura) {
+      queryBuilder.andWhere('ca.asignatura ILIKE :asignatura', {
+        asignatura: `%${filtros.asignatura}%`,
       });
     }
 

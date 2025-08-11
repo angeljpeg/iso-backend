@@ -27,10 +27,10 @@ export class FiltrosReporteSeguimientoDto {
   @IsUUID()
   profesorId?: string;
 
-  @ApiProperty({ required: false, description: 'ID de la asignatura' })
+  @ApiProperty({ required: false, description: 'Nombre de la asignatura' })
   @IsOptional()
-  @IsUUID()
-  asignaturaId?: string;
+  @IsString()
+  asignatura?: string;
 
   @ApiProperty({ required: false, description: 'ID del grupo' })
   @IsOptional()
