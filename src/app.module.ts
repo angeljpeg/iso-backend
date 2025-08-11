@@ -9,6 +9,7 @@ import { CuatrimestresModule } from './modules/Cuatrimestres/cuatrimestres.modul
 import { CargaAcademicaModule } from './modules/CargaAcademica/carga-academica.module';
 import { ProgramacionSeguimientoCursoModule } from '@modules/ProgramacionSeguimientoCurso/programacion-seguimiento-curso.module';
 import { EstadiasModule } from './modules/Estadias/estadias.module';
+import { AsesoriasModule } from '@modules/Asesorias/asesorias.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { EstadiasModule } from './modules/Estadias/estadias.module';
     CargaAcademicaModule,
     ProgramacionSeguimientoCursoModule,
     EstadiasModule,
+    AsesoriasModule,
   ],
   controllers: [],
   providers: [],
