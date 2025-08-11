@@ -120,6 +120,46 @@ export class CargaAcademicaService {
         });
       }
 
+      // Validación para tutores: un profesor solo puede ser tutor de un grupo en el mismo cuatrimestre
+      if (createCargaAcademicaDto.esTutor) {
+        const existingTutoriaProfesor =
+          await this.cargaAcademicaRepository.findOne({
+            where: {
+              profesorId: createCargaAcademicaDto.profesorId,
+              cuatrimestreId: grupo.cuatrimestreId,
+              esTutor: true,
+              activo: true,
+            },
+          });
+
+        if (existingTutoriaProfesor) {
+          throw new ErrorManager({
+            type: 'BAD_REQUEST',
+            message:
+              'El profesor ya es tutor de otro grupo en el mismo cuatrimestre',
+          });
+        }
+
+        // Validación para grupos: un grupo solo puede tener un tutor en el mismo cuatrimestre
+        const existingTutoriaGrupo =
+          await this.cargaAcademicaRepository.findOne({
+            where: {
+              grupoId: createCargaAcademicaDto.grupoId,
+              cuatrimestreId: grupo.cuatrimestreId,
+              esTutor: true,
+              activo: true,
+            },
+          });
+
+        if (existingTutoriaGrupo) {
+          throw new ErrorManager({
+            type: 'BAD_REQUEST',
+            message:
+              'El grupo ya tiene un tutor asignado en el mismo cuatrimestre',
+          });
+        }
+      }
+
       const nuevaCarga = this.cargaAcademicaRepository.create({
         ...createCargaAcademicaDto,
         cuatrimestreId: grupo.cuatrimestreId,
@@ -390,6 +430,57 @@ export class CargaAcademicaService {
               type: 'BAD_REQUEST',
               message:
                 'Ya existe otro profesor asignado a esta asignatura en el mismo grupo',
+            });
+          }
+        }
+      }
+
+      // Validaciones para tutores en actualización
+      if (updateCargaAcademicaDto.esTutor !== undefined) {
+        const nuevoEsTutor = updateCargaAcademicaDto.esTutor;
+        const profesorId =
+          updateCargaAcademicaDto.profesorId || cargaAcademica.profesorId;
+        const grupoId =
+          updateCargaAcademicaDto.grupoId || cargaAcademica.grupoId;
+        const cuatrimestreId =
+          updateData.cuatrimestreId || cargaAcademica.cuatrimestreId;
+
+        if (nuevoEsTutor) {
+          // Validación para profesores: un profesor solo puede ser tutor de un grupo en el mismo cuatrimestre
+          const existingTutoriaProfesor =
+            await this.cargaAcademicaRepository.findOne({
+              where: {
+                profesorId: profesorId,
+                cuatrimestreId: cuatrimestreId,
+                esTutor: true,
+                activo: true,
+              },
+            });
+
+          if (existingTutoriaProfesor && existingTutoriaProfesor.id !== id) {
+            throw new ErrorManager({
+              type: 'BAD_REQUEST',
+              message:
+                'El profesor ya es tutor de otro grupo en el mismo cuatrimestre',
+            });
+          }
+
+          // Validación para grupos: un grupo solo puede tener un tutor en el mismo cuatrimestre
+          const existingTutoriaGrupo =
+            await this.cargaAcademicaRepository.findOne({
+              where: {
+                grupoId: grupoId,
+                cuatrimestreId: cuatrimestreId,
+                esTutor: true,
+                activo: true,
+              },
+            });
+
+          if (existingTutoriaGrupo && existingTutoriaGrupo.id !== id) {
+            throw new ErrorManager({
+              type: 'BAD_REQUEST',
+              message:
+                'El grupo ya tiene un tutor asignado en el mismo cuatrimestre',
             });
           }
         }
