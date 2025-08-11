@@ -252,9 +252,7 @@ export class TutoriasController {
     description: 'Detalles de la tutoria obtenidos exitosamente',
     type: [TutoriaDetalle],
   })
-  getDetalles(
-    @Param('id') tutoriaId: string,
-  ): Promise<TutoriaDetalle[]> {
+  getDetalles(@Param('id') tutoriaId: string): Promise<TutoriaDetalle[]> {
     return this.tutoriaDetallesService.findByTutoria(tutoriaId);
   }
 
@@ -273,9 +271,7 @@ export class TutoriasController {
     type: TutoriaDetalle,
   })
   @ApiResponse({ status: 404, description: 'Detalle no encontrado' })
-  getDetalle(
-    @Param('detalleId') detalleId: string,
-  ): Promise<TutoriaDetalle> {
+  getDetalle(@Param('detalleId') detalleId: string): Promise<TutoriaDetalle> {
     return this.tutoriaDetallesService.findOne(detalleId);
   }
 
@@ -313,9 +309,7 @@ export class TutoriasController {
   })
   @ApiResponse({ status: 200, description: 'Detalle eliminado exitosamente' })
   @ApiResponse({ status: 404, description: 'Detalle no encontrado' })
-  removeDetalle(
-    @Param('detalleId') detalleId: string,
-  ): Promise<void> {
+  removeDetalle(@Param('detalleId') detalleId: string): Promise<void> {
     return this.tutoriaDetallesService.remove(detalleId);
   }
 

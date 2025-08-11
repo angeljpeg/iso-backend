@@ -62,11 +62,11 @@ export class CreateTutoriaDetalleDto {
   @IsEnum(CausaBaja)
   causaBaja?: CausaBaja;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'ID de la tutoria',
     type: 'string',
     format: 'uuid',
-    example: 'uuid-de-tutoria'
+    example: 'uuid-de-tutoria',
   })
   @IsUUID('4', { message: 'El ID de la tutoria debe ser un UUID válido' })
   @IsNotEmpty()
