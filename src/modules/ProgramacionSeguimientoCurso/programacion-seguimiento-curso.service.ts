@@ -115,10 +115,96 @@ export class ProgramacionSeguimientoCursoService {
     }
   }
 
-  async findAll() {
-    return await this.seguimientoCursoRepository.find({
-      relations: ['detalles', 'cargaAcademica'],
-    });
+  async findAll(filters?: {
+    page?: number;
+    limit?: number;
+    estado?: string;
+    cuatrimestreId?: string;
+    profesorId?: string;
+    carrera?: string;
+    search?: string;
+  }) {
+    try {
+      // Construir las condiciones de búsqueda
+      const whereConditions: any = {};
+
+      if (filters?.estado) {
+        whereConditions.estado = filters.estado;
+      }
+
+      if (filters?.cuatrimestreId) {
+        whereConditions.cuatrimestreId = filters.cuatrimestreId;
+      }
+
+      if (filters?.profesorId) {
+        whereConditions.cargaAcademica = { profesorId: filters.profesorId };
+      }
+
+      if (filters?.carrera) {
+        whereConditions.cargaAcademica = {
+          ...whereConditions.cargaAcademica,
+          carrera: filters.carrera,
+        };
+      }
+
+      // Aplicar paginación
+      const page = filters?.page || 1;
+      const limit = filters?.limit || 10;
+      const skip = (page - 1) * limit;
+
+      // Usar find con relations para asegurar que todas las relaciones se carguen
+      const [seguimientos] = await this.seguimientoCursoRepository.findAndCount(
+        {
+          where: whereConditions,
+          relations: [
+            'detalles',
+            'cargaAcademica',
+            'cargaAcademica.profesor',
+            'cargaAcademica.grupo',
+            'cargaAcademica.cuatrimestre',
+            'cuatrimestre',
+            'revisadoPor',
+          ],
+          skip,
+          take: limit,
+          order: { id: 'DESC' },
+        },
+      );
+
+      // Aplicar filtro de búsqueda si existe
+      let filteredSeguimientos = seguimientos;
+      if (filters?.search) {
+        const searchTerm = filters.search.toLowerCase();
+        filteredSeguimientos = seguimientos.filter((seguimiento) => {
+          const asignatura =
+            seguimiento.cargaAcademica?.asignatura?.toLowerCase() || '';
+          const carrera =
+            seguimiento.cargaAcademica?.carrera?.toLowerCase() || '';
+          const nombreProfesor =
+            seguimiento.cargaAcademica?.profesor?.nombre?.toLowerCase() || '';
+          const apellidoProfesor =
+            seguimiento.cargaAcademica?.profesor?.apellido?.toLowerCase() || '';
+
+          return (
+            asignatura.includes(searchTerm) ||
+            carrera.includes(searchTerm) ||
+            nombreProfesor.includes(searchTerm) ||
+            apellidoProfesor.includes(searchTerm)
+          );
+        });
+      }
+
+      return {
+        data: filteredSeguimientos,
+        total: filteredSeguimientos.length,
+        page,
+        limit,
+        totalPages: Math.ceil(filteredSeguimientos.length / limit),
+      };
+    } catch (error) {
+      console.error('Error en findAll:', error);
+      throw error;
+    }
   }
 
   async findOne(id: string) {
@@ -275,6 +361,17 @@ export class ProgramacionSeguimientoCursoService {
       ) {
         ErrorManager.createSignatureError(error.message);
       }
+      throw error;
+    }
+  }
+
+  // Método de prueba para verificar la conexión a la base de datos
+  async testDatabase(): Promise<number> {
+    try {
+      const count = await this.seguimientoCursoRepository.count();
+      return count;
+    } catch (error) {
+      console.error('Error en testDatabase:', error);
       throw error;
     }
   }

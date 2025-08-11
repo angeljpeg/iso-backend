@@ -8,6 +8,7 @@ import {
   UseGuards,
   Request,
   Delete,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -32,6 +33,38 @@ export class ProgramacionSeguimientoCursoController {
   constructor(
     private readonly programacionSeguimientoCursoService: ProgramacionSeguimientoCursoService,
   ) {}
+
+  @Get('test')
+  @ApiOperation({ summary: 'Endpoint de prueba' })
+  @ApiResponse({ status: 200, description: 'Backend funcionando' })
+  test() {
+    return {
+      message: 'Backend de programación y seguimiento de cursos funcionando',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  @Get('test-db')
+  @ApiOperation({ summary: 'Endpoint de prueba de base de datos' })
+  @ApiResponse({ status: 200, description: 'Base de datos funcionando' })
+  async testDb() {
+    try {
+      // Prueba simple sin relaciones complejas
+      const count =
+        await this.programacionSeguimientoCursoService.testDatabase();
+      return {
+        message: 'Base de datos funcionando correctamente',
+        seguimientosCount: count,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        message: 'Error en la base de datos',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -63,11 +96,88 @@ export class ProgramacionSeguimientoCursoController {
   @ApiQuery({ name: 'cuatrimestreId', required: false, type: String })
   @ApiQuery({ name: 'profesorId', required: false, type: String })
   @ApiQuery({ name: 'estado', required: false, enum: EstadoSeguimiento })
-  @ApiQuery({ name: 'semana', required: false, type: Number })
-  @ApiQuery({ name: 'conRetrasos', required: false, type: Boolean })
+  @ApiQuery({ name: 'carrera', required: false, type: String })
+  @ApiQuery({ name: 'search', required: false, type: String })
   @ApiResponse({ status: 200, description: 'Lista de seguimientos' })
-  findAll() {
-    return this.programacionSeguimientoCursoService.findAll();
+  findAll(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('cuatrimestreId') cuatrimestreId?: string,
+    @Query('profesorId') profesorId?: string,
+    @Query('estado') estado?: string,
+    @Query('carrera') carrera?: string,
+    @Query('search') search?: string,
+  ) {
+    const filters: {
+      page?: number;
+      limit?: number;
+      cuatrimestreId?: string;
+      profesorId?: string;
+      estado?: string;
+      carrera?: string;
+      search?: string;
+    } = {
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+      cuatrimestreId,
+      profesorId,
+      estado,
+      carrera,
+      search,
+    };
+
+    // Remover propiedades undefined
+    Object.keys(filters).forEach((key) => {
+      if (filters[key as keyof typeof filters] === undefined) {
+        delete filters[key as keyof typeof filters];
+      }
+    });
+
+    return this.programacionSeguimientoCursoService.findAll(filters);
+  }
+
+  @Get('profesor/:profesorId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('jwt-auth')
+  @ApiOperation({ summary: 'Obtener seguimientos por profesor' })
+  @ApiParam({ name: 'profesorId', required: true, type: String })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'cuatrimestreId', required: false, type: String })
+  @ApiQuery({ name: 'estado', required: false, enum: EstadoSeguimiento })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de seguimientos del profesor',
+  })
+  findByProfesor(
+    @Param('profesorId') profesorId: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('cuatrimestreId') cuatrimestreId?: string,
+    @Query('estado') estado?: string,
+  ) {
+    const filters: {
+      page?: number;
+      limit?: number;
+      cuatrimestreId?: string;
+      profesorId: string;
+      estado?: string;
+    } = {
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+      cuatrimestreId,
+      profesorId,
+      estado,
+    };
+
+    // Remover propiedades undefined
+    Object.keys(filters).forEach((key) => {
+      if (filters[key as keyof typeof filters] === undefined) {
+        delete filters[key as keyof typeof filters];
+      }
+    });
+
+    return this.programacionSeguimientoCursoService.findAll(filters);
   }
 
   @Get(':id')
