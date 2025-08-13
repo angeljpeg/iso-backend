@@ -11,6 +11,7 @@ import { ProgramacionSeguimientoCursoModule } from '@modules/ProgramacionSeguimi
 import { EstadiasModule } from './modules/Estadias/estadias.module';
 import { AsesoriasModule } from '@modules/Asesorias/asesorias.module';
 import { TutoriasModule } from './modules/Tutorias/tutorias.module';
+import { NecesidadesEspecialesModule } from './modules/NecesidadesEspeciales/necesidades-especiales.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { TutoriasModule } from './modules/Tutorias/tutorias.module';
     EstadiasModule,
     AsesoriasModule,
     TutoriasModule,
+    NecesidadesEspecialesModule,
   ],
   controllers: [],
   providers: [],

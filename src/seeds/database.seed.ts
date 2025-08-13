@@ -3,6 +3,7 @@ import { UsuariosSeed } from './usuarios.seed';
 import { GruposSeed } from './grupos.seed'; // ✅ Agregar import
 import { ProfesoresSeed } from './profesores.ts';
 import { seedEstadias } from './estadias.seed';
+import { seedNecesidadesEspeciales } from './necesidades-especiales.seed';
 
 export const seedDatabase = async (dataSource: DataSource) => {
   try {
@@ -13,6 +14,7 @@ export const seedDatabase = async (dataSource: DataSource) => {
     await GruposSeed(dataSource); // ✅ Ejecutar antes de profesores
     await ProfesoresSeed(dataSource);
     await seedEstadias(dataSource);
+    await seedNecesidadesEspeciales(dataSource);
 
     console.log('✅ Seeds ejecutados correctamente');
   } catch (error) {
