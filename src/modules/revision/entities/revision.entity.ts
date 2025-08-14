@@ -41,6 +41,6 @@ export class Revision {
   @Column({ type: 'enum', enum: FormatosRevision, nullable: false })
   formato: FormatosRevision;
 
-  @Column({ type: 'uuid', length: 100 })
+  @Column({ type: 'uuid' })
   formato_id: string;
 }
