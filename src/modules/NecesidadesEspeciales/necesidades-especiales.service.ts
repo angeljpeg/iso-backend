@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, Between, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { NecesidadesEspeciales } from './entities/necesidades-especiales.entity';
 import {
   CreateNecesidadesEspecialesDto,
@@ -71,9 +71,9 @@ export class NecesidadesEspecialesService {
     };
   }
 
-  async findOne(id: number): Promise<NecesidadesEspeciales> {
+  async findOne(id: string): Promise<NecesidadesEspeciales> {
     const necesidades = await this.necesidadesEspecialesRepository.findOne({
-      where: { id, isDeleted: false },
+      where: { id: +id, isDeleted: false },
       relations: ['cargaAcademica', 'cargaAcademica.usuario'],
     });
 
@@ -87,7 +87,7 @@ export class NecesidadesEspecialesService {
   }
 
   async findByCargaAcademica(
-    cargaAcademicaId: number,
+    cargaAcademicaId: string,
   ): Promise<NecesidadesEspeciales[]> {
     return await this.necesidadesEspecialesRepository.find({
       where: { cargaAcademicaId, isDeleted: false },
@@ -97,14 +97,14 @@ export class NecesidadesEspecialesService {
   }
 
   async update(
-    id: number,
+    id: string,
     updateDto: UpdateNecesidadesEspecialesDto,
   ): Promise<NecesidadesEspeciales> {
     const necesidades = await this.findOne(id);
 
-    if (updateDto.cargaAcademicaId) {
+    if ('cargaAcademicaId' in updateDto && updateDto.cargaAcademicaId) {
       const cargaAcademica = await this.cargaAcademicaRepository.findOne({
-        where: { id: updateDto.cargaAcademicaId },
+        where: { id: updateDto.cargaAcademicaId as string },
       });
 
       if (!cargaAcademica) {
@@ -118,7 +118,7 @@ export class NecesidadesEspecialesService {
     return await this.necesidadesEspecialesRepository.save(necesidades);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const necesidades = await this.findOne(id);
     necesidades.isDeleted = true;
     await this.necesidadesEspecialesRepository.save(necesidades);

@@ -90,6 +90,6 @@ export class CreateNecesidadesEspecialesDto {
   otrasNecesidades?: string;
 
   // Relación con carga académica
-  @IsNumber()
-  cargaAcademicaId: number;
+  @IsString()
+  cargaAcademicaId: string;
 }

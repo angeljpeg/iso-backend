@@ -25,9 +25,8 @@ export class QueryNecesidadesEspecialesDto {
   nombreProfesor?: string;
 
   @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  cargaAcademicaId?: number;
+  @IsString()
+  cargaAcademicaId?: string;
 
   @IsOptional()
   @IsBoolean()

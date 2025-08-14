@@ -167,7 +167,7 @@ export class NecesidadesEspecialesController {
     description: 'Registro de necesidades especiales no encontrado',
   })
   async findOne(@Param('id') id: string) {
-    return await this.necesidadesEspecialesService.findOne(+id);
+    return await this.necesidadesEspecialesService.findOne(id);
   }
 
   @Get('carga-academica/:cargaAcademicaId')
@@ -188,7 +188,7 @@ export class NecesidadesEspecialesController {
     @Param('cargaAcademicaId') cargaAcademicaId: string,
   ) {
     return await this.necesidadesEspecialesService.findByCargaAcademica(
-      +cargaAcademicaId,
+      cargaAcademicaId,
     );
   }
 
@@ -215,7 +215,7 @@ export class NecesidadesEspecialesController {
     @Param('id') id: string,
     @Body() updateDto: UpdateNecesidadesEspecialesDto,
   ) {
-    return await this.necesidadesEspecialesService.update(+id, updateDto);
+    return await this.necesidadesEspecialesService.update(id, updateDto);
   }
 
   @Delete(':id')
@@ -233,6 +233,6 @@ export class NecesidadesEspecialesController {
     description: 'Registro de necesidades especiales no encontrado',
   })
   async remove(@Param('id') id: string) {
-    await this.necesidadesEspecialesService.remove(+id);
+    await this.necesidadesEspecialesService.remove(id);
   }
 }

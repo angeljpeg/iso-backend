@@ -86,7 +86,7 @@ export class NecesidadesEspeciales {
   cargaAcademica: CargaAcademica;
 
   @Column()
-  cargaAcademicaId: number;
+  cargaAcademicaId: string;
 
   @CreateDateColumn()
   createdAt: Date;
