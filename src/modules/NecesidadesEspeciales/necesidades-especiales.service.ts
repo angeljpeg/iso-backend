@@ -25,9 +25,8 @@ export class NecesidadesEspecialesService {
   async create(
     createDto: CreateNecesidadesEspecialesDto,
   ): Promise<NecesidadesEspeciales> {
-    // Verificar que la carga académica existe
     const cargaAcademica = await this.cargaAcademicaRepository.findOne({
-      where: { id: createDto.cargaAcademicaId },
+      where: { id: createDto.cargaAcademica },
     });
 
     if (!cargaAcademica) {
@@ -36,8 +35,13 @@ export class NecesidadesEspecialesService {
       );
     }
 
-    const necesidadesEspeciales =
-      this.necesidadesEspecialesRepository.create(createDto);
+    const necesidadesEspeciales = this.necesidadesEspecialesRepository.create({
+      ...createDto,
+      cargaAcademica,
+      fechaRevision: createDto.fechaRevision || undefined,
+      numeroRevision: createDto.numeroRevision || undefined,
+    });
+
     return await this.necesidadesEspecialesRepository.save(
       necesidadesEspeciales,
     );
@@ -50,7 +54,7 @@ export class NecesidadesEspecialesService {
     const queryBuilder = this.necesidadesEspecialesRepository
       .createQueryBuilder('ne')
       .leftJoinAndSelect('ne.cargaAcademica', 'ca')
-      .leftJoinAndSelect('ca.usuario', 'usuario')
+      .leftJoinAndSelect('ca.profesor', 'usuario')
       .where('ne.isDeleted = :isDeleted', { isDeleted: false });
 
     // Aplicar filtros
@@ -74,7 +78,7 @@ export class NecesidadesEspecialesService {
   async findOne(id: string): Promise<NecesidadesEspeciales> {
     const necesidades = await this.necesidadesEspecialesRepository.findOne({
       where: { id: +id, isDeleted: false },
-      relations: ['cargaAcademica', 'cargaAcademica.usuario'],
+      relations: ['cargaAcademica', 'cargaAcademica.profesor'],
     });
 
     if (!necesidades) {
@@ -90,8 +94,8 @@ export class NecesidadesEspecialesService {
     cargaAcademicaId: string,
   ): Promise<NecesidadesEspeciales[]> {
     return await this.necesidadesEspecialesRepository.find({
-      where: { cargaAcademicaId, isDeleted: false },
-      relations: ['cargaAcademica', 'cargaAcademica.usuario'],
+      where: { cargaAcademica: { id: cargaAcademicaId }, isDeleted: false },
+      relations: ['cargaAcademica', 'cargaAcademica.profesor'],
       order: { fecha: 'DESC' },
     });
   }
@@ -102,9 +106,9 @@ export class NecesidadesEspecialesService {
   ): Promise<NecesidadesEspeciales> {
     const necesidades = await this.findOne(id);
 
-    if ('cargaAcademicaId' in updateDto && updateDto.cargaAcademicaId) {
+    if ('cargaAcademica' in updateDto && updateDto.cargaAcademica) {
       const cargaAcademica = await this.cargaAcademicaRepository.findOne({
-        where: { id: updateDto.cargaAcademicaId as string },
+        where: { id: updateDto.cargaAcademica },
       });
 
       if (!cargaAcademica) {
@@ -114,7 +118,31 @@ export class NecesidadesEspecialesService {
       }
     }
 
-    Object.assign(necesidades, updateDto);
+    // Filtrar solo los campos que tienen valores válidos
+    const filteredUpdateDto: any = {};
+
+    Object.entries(updateDto).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        // Para campos de fecha, validar que sean válidos
+        if (key === 'fechaRevision' && value) {
+          const fecha = new Date(value as string);
+          if (isNaN(fecha.getTime())) {
+            throw new BadRequestException('La fecha de revisión no es válida');
+          }
+          filteredUpdateDto[key] = fecha;
+        } else if (key === 'fecha' && value) {
+          const fecha = new Date(value as string);
+          if (isNaN(fecha.getTime())) {
+            throw new BadRequestException('La fecha no es válida');
+          }
+          filteredUpdateDto[key] = fecha;
+        } else {
+          filteredUpdateDto[key] = value;
+        }
+      }
+    });
+
+    Object.assign(necesidades, filteredUpdateDto);
     return await this.necesidadesEspecialesRepository.save(necesidades);
   }
 
@@ -152,9 +180,9 @@ export class NecesidadesEspecialesService {
       });
     }
 
-    if (filters.cargaAcademicaId) {
-      queryBuilder.andWhere('ne.cargaAcademicaId = :cargaAcademicaId', {
-        cargaAcademicaId: filters.cargaAcademicaId,
+    if (filters.cargaAcademica) {
+      queryBuilder.andWhere('ca.id = :cargaAcademica', {
+        cargaAcademica: filters.cargaAcademica,
       });
     }
 

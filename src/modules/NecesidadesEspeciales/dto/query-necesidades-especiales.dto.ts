@@ -1,10 +1,4 @@
-import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  IsBoolean,
-  IsDate,
-} from 'class-validator';
+import { IsOptional, IsString, IsBoolean, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class QueryNecesidadesEspecialesDto {
@@ -26,7 +20,7 @@ export class QueryNecesidadesEspecialesDto {
 
   @IsOptional()
   @IsString()
-  cargaAcademicaId?: string;
+  cargaAcademica?: string;
 
   @IsOptional()
   @IsBoolean()
@@ -54,22 +48,20 @@ export class QueryNecesidadesEspecialesDto {
   excepcionesSuperdotacion?: boolean;
 
   @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  fechaDesde?: Date;
+  @IsString()
+  fechaDesde?: string;
 
   @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  fechaHasta?: Date;
-
-  @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  page?: number = 1;
+  @IsString()
+  fechaHasta?: string;
 
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
-  limit?: number = 10;
+  page?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  limit?: number;
 }

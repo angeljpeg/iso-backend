@@ -1,12 +1,13 @@
 import {
   IsDate,
   IsString,
-  IsNumber,
   IsBoolean,
   IsOptional,
   IsNotEmpty,
-  Min,
   MaxLength,
+  IsUUID,
+  IsNumber,
+  Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -30,13 +31,16 @@ export class CreateNecesidadesEspecialesDto {
   @MaxLength(255)
   programaEducativo: string;
 
+  @IsOptional()
   @IsDate()
   @Type(() => Date)
-  fechaRevision: Date;
+  fechaRevision?: Date;
 
+  @IsOptional()
   @IsNumber()
-  @Min(1)
-  numeroRevision: number;
+  @Min(0)
+  @Type(() => Number)
+  numeroRevision?: number;
 
   // Excepciones conductuales
   @IsBoolean()
@@ -90,6 +94,6 @@ export class CreateNecesidadesEspecialesDto {
   otrasNecesidades?: string;
 
   // Relación con carga académica
-  @IsString()
-  cargaAcademicaId: string;
+  @IsUUID()
+  cargaAcademica: string;
 }

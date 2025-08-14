@@ -1,5 +1,5 @@
 export class NecesidadesEspecialesResponseDto {
-  id: number;
+  id: string;
   fecha: Date;
   nombreAlumno: string;
   numeroMatricula: string;

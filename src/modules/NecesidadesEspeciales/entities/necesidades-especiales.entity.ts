@@ -35,10 +35,10 @@ export class NecesidadesEspeciales {
   @Column({ length: 255 })
   programaEducativo: string;
 
-  @Column({ type: 'date' })
-  fechaRevision: Date;
+  @Column({ type: 'date', nullable: true })
+  fechaRevision: Date | null;
 
-  @Column()
+  @Column({ nullable: false, type: 'int', default: 0 })
   numeroRevision: number;
 
   // Excepciones conductuales
@@ -84,9 +84,6 @@ export class NecesidadesEspeciales {
   @ManyToOne(() => CargaAcademica, { nullable: false })
   @JoinColumn({ name: 'carga_academica_id' })
   cargaAcademica: CargaAcademica;
-
-  @Column()
-  cargaAcademicaId: string;
 
   @CreateDateColumn()
   createdAt: Date;
