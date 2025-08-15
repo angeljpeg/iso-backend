@@ -245,10 +245,9 @@ export class ReportesTutoriasService {
       .addSelect('profesor.nombre', 'nombreProfesor')
       .addSelect('COUNT(DISTINCT t.id)', 'totalTutorias')
       .addSelect('COUNT(td.id)', 'totalDetalles')
-      .where('1=1')
       .groupBy('profesor.id')
       .addGroupBy('profesor.nombre')
-      .orderBy('totalDetalles', 'DESC')
+      .orderBy('COUNT(td.id)', 'DESC')
       .getRawMany<{
         profesorId: string;
         nombreProfesor: string;
