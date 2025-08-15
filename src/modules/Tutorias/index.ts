@@ -3,3 +3,7 @@ export * from './dto';
 export * from './services';
 export * from './tutorias.controller';
 export * from './tutorias.module';
+export * from './tutoria-detalles.service';
+export * from './tutorias.service';
+export * from './reportes-tutorias.service';
+export * from './reportes-tutorias.controller';
