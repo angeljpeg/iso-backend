@@ -63,7 +63,7 @@ export interface ReportePorCarrera {
 }
 
 export interface ReportePorProfesor {
-  profesorId: number;
+  profesorId: string;
   nombreProfesor: string;
   totalAlumnos: number;
   totalNecesidades: number;
@@ -181,6 +181,7 @@ export class ReportesNecesidadesEspecialesService {
       { nombre: 'Intelectuales', campo: 'excepcionesIntelectuales' },
       { nombre: 'Físicas', campo: 'excepcionesFisicas' },
       { nombre: 'Superdotación', campo: 'excepcionesSuperdotacion' },
+      { nombre: 'Otras', campo: 'otrasNecesidades' },
     ];
 
     const reportes = await Promise.all(
@@ -252,28 +253,28 @@ export class ReportesNecesidadesEspecialesService {
   async getReportePorProfesor(
     fechaDesde?: Date,
     fechaHasta?: Date,
-    profesorId?: number,
+    profesorId?: string,
   ): Promise<ReportePorProfesor[]> {
     const queryBuilder = this.buildBaseQuery(
       fechaDesde,
       fechaHasta,
-    ).leftJoinAndSelect('ca.usuario', 'usuario');
+    ).leftJoinAndSelect('ca.profesor', 'profesor');
 
     if (profesorId) {
-      queryBuilder.andWhere('ca.usuarioId = :profesorId', { profesorId });
+      queryBuilder.andWhere('ca.profesorId = :profesorId', { profesorId });
     }
 
     const profesores = await this.cargaAcademicaRepository
       .createQueryBuilder('ca')
-      .leftJoin('ca.usuario', 'usuario')
-      .leftJoin('ca.necesidadesEspeciales', 'ne')
-      .select('usuario.id', 'profesorId')
-      .addSelect('usuario.nombre', 'nombreProfesor')
+      .leftJoin('ca.profesor', 'profesor')
+      .leftJoin(NecesidadesEspeciales, 'ne', 'ne.carga_academica_id = ca.id')
+      .select('profesor.id', 'profesorId')
+      .addSelect('profesor.nombre', 'nombreProfesor')
       .addSelect('COUNT(DISTINCT ne.id)', 'totalNecesidades')
       .addSelect('COUNT(DISTINCT ca.id)', 'totalAlumnos')
       .where('ne.isDeleted = :isDeleted', { isDeleted: false })
-      .groupBy('usuario.id')
-      .addGroupBy('usuario.nombre')
+      .groupBy('profesor.id')
+      .addGroupBy('profesor.nombre')
       .orderBy('totalNecesidades', 'DESC')
       .getRawMany<ProfesorRawResult>();
 
@@ -281,16 +282,16 @@ export class ReportesNecesidadesEspecialesService {
       profesores.map(async (profesor) => {
         const distribucionPorTipo =
           await this.getDistribucionPorTipoPorProfesor(
-            parseInt(profesor.profesorId),
+            profesor.profesorId,
             queryBuilder,
           );
         const alumnos = await this.getAlumnosPorProfesor(
-          parseInt(profesor.profesorId),
+          profesor.profesorId,
           queryBuilder,
         );
 
         return {
-          profesorId: parseInt(profesor.profesorId),
+          profesorId: profesor.profesorId,
           nombreProfesor: profesor.nombreProfesor,
           totalAlumnos: parseInt(profesor.totalAlumnos),
           totalNecesidades: parseInt(profesor.totalNecesidades),
@@ -311,7 +312,7 @@ export class ReportesNecesidadesEspecialesService {
       .createQueryBuilder('ne')
       .leftJoinAndSelect('ne.cargaAcademica', 'ca')
       .where('ne.isDeleted = :isDeleted', { isDeleted: false })
-      .andWhere('YEAR(ne.fecha) = :anio', { anio });
+      .andWhere('EXTRACT(YEAR FROM ne.fecha) = :anio', { anio });
 
     if (programaEducativo) {
       queryBuilder.andWhere('ne.programaEducativo = :programaEducativo', {
@@ -338,7 +339,8 @@ export class ReportesNecesidadesEspecialesService {
       meses.map(async (mes, index) => {
         const mesNumero = index + 1;
         const total = await queryBuilder
-          .andWhere('MONTH(ne.fecha) = :mes', { mes: mesNumero })
+          .clone()
+          .andWhere('EXTRACT(MONTH FROM ne.fecha) = :mes', { mes: mesNumero })
           .getCount();
 
         const distribucionPorTipo = await this.getDistribucionPorTipoPorMes(
@@ -349,7 +351,8 @@ export class ReportesNecesidadesEspecialesService {
         // Calcular variación con el mes anterior
         const mesAnterior = mesNumero === 1 ? 12 : mesNumero - 1;
         const totalMesAnterior = await queryBuilder
-          .andWhere('MONTH(ne.fecha) = :mes', { mes: mesAnterior })
+          .clone()
+          .andWhere('EXTRACT(MONTH FROM ne.fecha) = :mes', { mes: mesAnterior })
           .getCount();
 
         const variacion =
@@ -445,8 +448,8 @@ export class ReportesNecesidadesEspecialesService {
     queryBuilder: SelectQueryBuilder<NecesidadesEspeciales>,
   ): Promise<number> {
     return await queryBuilder
-      .leftJoin('ca.usuario', 'usuario')
-      .select('COUNT(DISTINCT usuario.id)', 'total')
+      .leftJoin('ca.profesor', 'profesor')
+      .select('COUNT(DISTINCT profesor.id)', 'total')
       .getRawOne<CountRawResult>()
       .then((result) => parseInt(result?.total || '0') || 0);
   }
@@ -460,12 +463,14 @@ export class ReportesNecesidadesEspecialesService {
       intelectuales,
       fisicas,
       superdotacion,
+      otras,
     ] = await Promise.all([
       this.getTotalPorTipo(queryBuilder, 'excepcionesConductuales'),
       this.getTotalPorTipo(queryBuilder, 'excepcionesComunicacionales'),
       this.getTotalPorTipo(queryBuilder, 'excepcionesIntelectuales'),
       this.getTotalPorTipo(queryBuilder, 'excepcionesFisicas'),
       this.getTotalPorTipo(queryBuilder, 'excepcionesSuperdotacion'),
+      this.getTotalPorTipo(queryBuilder, 'otrasNecesidades'),
     ]);
 
     return {
@@ -474,7 +479,7 @@ export class ReportesNecesidadesEspecialesService {
       intelectuales,
       fisicas,
       superdotacion,
-      otras: 0, // Implementar lógica para otras necesidades
+      otras,
     };
   }
 
@@ -482,7 +487,14 @@ export class ReportesNecesidadesEspecialesService {
     queryBuilder: SelectQueryBuilder<NecesidadesEspeciales>,
     campo: string,
   ): Promise<number> {
-    return await queryBuilder
+    const qb = queryBuilder.clone();
+    if (campo === 'otrasNecesidades') {
+      qb.andWhere(
+        "ne.otrasNecesidades IS NOT NULL AND ne.otrasNecesidades <> ''",
+      );
+      return await qb.getCount();
+    }
+    return await qb
       .andWhere(`ne.${campo} = :valor`, { valor: true })
       .getCount();
   }
@@ -491,17 +503,47 @@ export class ReportesNecesidadesEspecialesService {
     queryBuilder: SelectQueryBuilder<NecesidadesEspeciales>,
     campo: string,
   ): Promise<any[]> {
-    return await queryBuilder
+    const qb = queryBuilder.clone();
+    const especificacionCampo = this.mapCampoToEspecificacion(campo);
+    if (campo === 'otrasNecesidades') {
+      qb.andWhere(
+        "ne.otrasNecesidades IS NOT NULL AND ne.otrasNecesidades <> ''",
+      );
+    } else {
+      qb.andWhere(`ne.${campo} = :valor`, { valor: true });
+    }
+
+    const resultados = await qb
       .select([
-        'ne.id',
-        'ne.nombreAlumno',
-        'ne.numeroMatricula',
-        'ne.programaEducativo',
-        `ne.especificacion${campo.charAt(0).toUpperCase() + campo.slice(1).replace('excepciones', '')}`,
-        'ne.fecha',
+        'ne.id as id',
+        'ne.nombreAlumno as nombreAlumno',
+        'ne.numeroMatricula as numeroMatricula',
+        'ne.programaEducativo as programaEducativo',
+        `${especificacionCampo} as especificacion`,
+        'ne.fecha as fecha',
       ])
-      .andWhere(`ne.${campo} = :valor`, { valor: true })
-      .getMany();
+      .getRawMany();
+
+    return resultados;
+  }
+
+  private mapCampoToEspecificacion(campo: string): string {
+    switch (campo) {
+      case 'excepcionesConductuales':
+        return 'ne.especificacionConductual';
+      case 'excepcionesComunicacionales':
+        return 'ne.especificacionComunicacional';
+      case 'excepcionesIntelectuales':
+        return 'ne.especificacionIntelectual';
+      case 'excepcionesFisicas':
+        return 'ne.especificacionFisica';
+      case 'excepcionesSuperdotacion':
+        return 'ne.especificacionSuperdotacion';
+      case 'otrasNecesidades':
+        return 'ne.otrasNecesidades';
+      default:
+        return 'ne.otrasNecesidades';
+    }
   }
 
   private async getDistribucionPorCarrera(
@@ -548,7 +590,8 @@ export class ReportesNecesidadesEspecialesService {
     return await Promise.all(
       meses.map(async (mes, index) => {
         const total = await queryBuilder
-          .andWhere('MONTH(ne.fecha) = :mes', { mes: index + 1 })
+          .clone()
+          .andWhere('EXTRACT(MONTH FROM ne.fecha) = :mes', { mes: index + 1 })
           .getCount();
 
         return {
@@ -573,12 +616,14 @@ export class ReportesNecesidadesEspecialesService {
       intelectuales,
       fisicas,
       superdotacion,
+      otras,
     ] = await Promise.all([
       this.getTotalPorTipo(carreraQuery, 'excepcionesConductuales'),
       this.getTotalPorTipo(carreraQuery, 'excepcionesComunicacionales'),
       this.getTotalPorTipo(carreraQuery, 'excepcionesIntelectuales'),
       this.getTotalPorTipo(carreraQuery, 'excepcionesFisicas'),
       this.getTotalPorTipo(carreraQuery, 'excepcionesSuperdotacion'),
+      this.getTotalPorTipo(carreraQuery, 'otrasNecesidades'),
     ]);
 
     return {
@@ -587,7 +632,7 @@ export class ReportesNecesidadesEspecialesService {
       intelectuales,
       fisicas,
       superdotacion,
-      otras: 0,
+      otras,
     };
   }
 
@@ -610,12 +655,12 @@ export class ReportesNecesidadesEspecialesService {
   }
 
   private async getDistribucionPorTipoPorProfesor(
-    profesorId: number,
+    profesorId: string,
     queryBuilder: SelectQueryBuilder<NecesidadesEspeciales>,
   ): Promise<any> {
     const profesorQuery = queryBuilder
       .clone()
-      .andWhere('ca.usuarioId = :profesorId', { profesorId });
+      .andWhere('ca.profesorId = :profesorId', { profesorId });
 
     const [
       conductuales,
@@ -623,12 +668,14 @@ export class ReportesNecesidadesEspecialesService {
       intelectuales,
       fisicas,
       superdotacion,
+      otras,
     ] = await Promise.all([
       this.getTotalPorTipo(profesorQuery, 'excepcionesConductuales'),
       this.getTotalPorTipo(profesorQuery, 'excepcionesComunicacionales'),
       this.getTotalPorTipo(profesorQuery, 'excepcionesIntelectuales'),
       this.getTotalPorTipo(profesorQuery, 'excepcionesFisicas'),
       this.getTotalPorTipo(profesorQuery, 'excepcionesSuperdotacion'),
+      this.getTotalPorTipo(profesorQuery, 'otrasNecesidades'),
     ]);
 
     return {
@@ -637,12 +684,12 @@ export class ReportesNecesidadesEspecialesService {
       intelectuales,
       fisicas,
       superdotacion,
-      otras: 0,
+      otras,
     };
   }
 
   private async getAlumnosPorProfesor(
-    profesorId: number,
+    profesorId: string,
     queryBuilder: SelectQueryBuilder<NecesidadesEspeciales>,
   ): Promise<any[]> {
     return await queryBuilder
@@ -652,7 +699,7 @@ export class ReportesNecesidadesEspecialesService {
         'ne.numeroMatricula',
         'ne.programaEducativo',
       ])
-      .andWhere('ca.usuarioId = :profesorId', { profesorId })
+      .andWhere('ca.profesorId = :profesorId', { profesorId })
       .getMany()
       .then((alumnos) =>
         alumnos.map((alumno) => ({
@@ -671,7 +718,7 @@ export class ReportesNecesidadesEspecialesService {
   ): Promise<any> {
     const mesQuery = queryBuilder
       .clone()
-      .andWhere('MONTH(ne.fecha) = :mes', { mes });
+      .andWhere('EXTRACT(MONTH FROM ne.fecha) = :mes', { mes });
 
     const [
       conductuales,
@@ -679,12 +726,14 @@ export class ReportesNecesidadesEspecialesService {
       intelectuales,
       fisicas,
       superdotacion,
+      otras,
     ] = await Promise.all([
       this.getTotalPorTipo(mesQuery, 'excepcionesConductuales'),
       this.getTotalPorTipo(mesQuery, 'excepcionesComunicacionales'),
       this.getTotalPorTipo(mesQuery, 'excepcionesIntelectuales'),
       this.getTotalPorTipo(mesQuery, 'excepcionesFisicas'),
       this.getTotalPorTipo(mesQuery, 'excepcionesSuperdotacion'),
+      this.getTotalPorTipo(mesQuery, 'otrasNecesidades'),
     ]);
 
     return {
@@ -693,7 +742,7 @@ export class ReportesNecesidadesEspecialesService {
       intelectuales,
       fisicas,
       superdotacion,
-      otras: 0,
+      otras,
     };
   }
 

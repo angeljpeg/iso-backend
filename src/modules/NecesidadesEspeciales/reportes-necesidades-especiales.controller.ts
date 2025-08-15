@@ -172,7 +172,7 @@ export class ReportesNecesidadesEspecialesController {
     name: 'profesorId',
     required: false,
     description: 'ID específico del profesor',
-    type: Number,
+    type: String,
   })
   @ApiResponse({
     status: 200,
@@ -181,7 +181,7 @@ export class ReportesNecesidadesEspecialesController {
   async getReportePorProfesor(
     @Query('fechaDesde') fechaDesde?: string,
     @Query('fechaHasta') fechaHasta?: string,
-    @Query('profesorId') profesorId?: number,
+    @Query('profesorId') profesorId?: string,
   ): Promise<ReportePorProfesor[]> {
     return await this.reportesService.getReportePorProfesor(
       fechaDesde ? new Date(fechaDesde) : undefined,
