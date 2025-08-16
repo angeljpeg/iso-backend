@@ -128,6 +128,23 @@ export class EstadiasService {
     await this.estadiaAlumnoRepository.save(alumno);
   }
 
+  async restoreAlumno(id: string): Promise<EstadiaAlumno> {
+    // Permite restaurar un alumno previamente inactivado
+    const alumno = await this.estadiaAlumnoRepository.findOne({
+      where: { id },
+      relations: ['estadia', 'progresoMensual'],
+    });
+
+    if (!alumno) {
+      throw new NotFoundException(
+        `Alumno de estadía con ID ${id} no encontrado`,
+      );
+    }
+
+    alumno.activo = true;
+    return await this.estadiaAlumnoRepository.save(alumno);
+  }
+
   // Métodos para Progreso Mensual
   async createProgreso(
     createProgresoMensualDto: CreateProgresoMensualDto,

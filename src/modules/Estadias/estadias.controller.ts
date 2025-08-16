@@ -334,6 +334,17 @@ export class EstadiasController {
     return this.estadiasService.removeAlumno(id);
   }
 
+  @Patch('alumnos/:id/restore')
+  @ApiBearerAuth('jwt-auth')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(RolUsuario.COORDINADOR, RolUsuario.MODERADOR)
+  @ApiOperation({ summary: 'Restaurar alumno inactivo' })
+  @ApiParam({ name: 'id', description: 'UUID del alumno', type: 'string' })
+  @ApiResponse({ status: 200, description: 'Alumno restaurado exitosamente' })
+  restoreAlumno(@Param('id') id: string) {
+    return this.estadiasService.restoreAlumno(id);
+  }
+
   // Rutas para Progreso Mensual
   @Post('progreso')
   @ApiBearerAuth('jwt-auth')
