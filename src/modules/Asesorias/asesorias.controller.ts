@@ -60,11 +60,8 @@ export class AsesoriasController {
     status: 500,
     description: 'Error interno del servidor',
   })
-  create(
-    @Body() createAsesoriaDto: CreateAsesoriaDto,
-    @Request() req: AuthenticatedRequest,
-  ): Promise<Asesoria> {
-    return this.asesoriasService.create(createAsesoriaDto, req.user);
+  create(@Body() createAsesoriaDto: CreateAsesoriaDto): Promise<Asesoria> {
+    return this.asesoriasService.create(createAsesoriaDto);
   }
 
   @Get('test-relations')
@@ -244,7 +241,11 @@ export class AsesoriasController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
+  @Roles(
+    RolUsuario.COORDINADOR,
+    RolUsuario.PROFESOR_TIEMPO_COMPLETO,
+    RolUsuario.PROFESOR_ASIGNATURA,
+  )
   @ApiBearerAuth('jwt-auth')
   @ApiOperation({
     summary: 'Actualizar asesoría',
@@ -280,14 +281,17 @@ export class AsesoriasController {
   update(
     @Param('id') id: string,
     @Body() updateAsesoriaDto: UpdateAsesoriaDto,
-    @Request() req: AuthenticatedRequest,
   ): Promise<Asesoria> {
-    return this.asesoriasService.update(id, updateAsesoriaDto, req.user);
+    return this.asesoriasService.update(id, updateAsesoriaDto);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolUsuario.PROFESOR_TIEMPO_COMPLETO, RolUsuario.PROFESOR_ASIGNATURA)
+  @Roles(
+    RolUsuario.COORDINADOR,
+    RolUsuario.PROFESOR_TIEMPO_COMPLETO,
+    RolUsuario.PROFESOR_ASIGNATURA,
+  )
   @ApiBearerAuth('jwt-auth')
   @ApiOperation({
     summary: 'Eliminar asesoría',

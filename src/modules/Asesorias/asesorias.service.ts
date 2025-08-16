@@ -66,22 +66,8 @@ export class AsesoriasService {
     }
   }
 
-  async create(
-    createAsesoriaDto: CreateAsesoriaDto,
-    createdBy: Usuario,
-  ): Promise<Asesoria> {
+  async create(createAsesoriaDto: CreateAsesoriaDto): Promise<Asesoria> {
     try {
-      // Solo los profesores pueden crear asesorías
-      if (
-        createdBy.rol !== RolUsuario.PROFESOR_TIEMPO_COMPLETO &&
-        createdBy.rol !== RolUsuario.PROFESOR_ASIGNATURA
-      ) {
-        throw new ErrorManager({
-          type: 'FORBIDDEN',
-          message: 'Solo los profesores pueden crear asesorías',
-        });
-      }
-
       // Verificar que la carga académica existe
       await this.cargaAcademicaService.findOne(
         createAsesoriaDto.cargaAcademicaId,
@@ -287,20 +273,8 @@ export class AsesoriasService {
   async update(
     id: string,
     updateAsesoriaDto: UpdateAsesoriaDto,
-    updatedBy: Usuario,
   ): Promise<Asesoria> {
     try {
-      // Solo los profesores pueden actualizar asesorías
-      if (
-        updatedBy.rol !== RolUsuario.PROFESOR_TIEMPO_COMPLETO &&
-        updatedBy.rol !== RolUsuario.PROFESOR_ASIGNATURA
-      ) {
-        throw new ErrorManager({
-          type: 'FORBIDDEN',
-          message: 'Solo los profesores pueden actualizar asesorías',
-        });
-      }
-
       const asesoria = await this.findOne(id);
 
       // Verificar que no existe una asesoría duplicada para la misma carga académica, fecha y tema
