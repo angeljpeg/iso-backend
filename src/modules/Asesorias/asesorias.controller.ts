@@ -27,7 +27,6 @@ import { JwtAuthGuard } from '@guards/jwt-auth.guard';
 import { RolesGuard } from '@guards/roles.guard';
 import { Roles } from '@decorators/roles.decorator';
 import { RolUsuario } from '../Usuarios/entities/usuario.entity';
-import { AuthenticatedRequest } from '@interfaces/auth-request.interface';
 
 @ApiTags('asesorias')
 @Controller('asesorias')
@@ -319,10 +318,7 @@ export class AsesoriasController {
     status: 500,
     description: 'Error interno del servidor',
   })
-  remove(
-    @Param('id') id: string,
-    @Request() req: AuthenticatedRequest,
-  ): Promise<void> {
-    return this.asesoriasService.remove(id, req.user);
+  remove(@Param('id') id: string): Promise<void> {
+    return this.asesoriasService.remove(id);
   }
 }

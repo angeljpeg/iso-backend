@@ -2,7 +2,6 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not } from 'typeorm';
 import { Asesoria } from './entities/asesoria.entity';
-import { Usuario, RolUsuario } from '../Usuarios/entities/usuario.entity';
 import { CargaAcademicaService } from '../CargaAcademica/carga-academica.service';
 import { ErrorManager } from '../../utils/error-manager';
 import { CreateAsesoriaDto } from './dto/create-asesoria.dto';
@@ -315,19 +314,8 @@ export class AsesoriasService {
     }
   }
 
-  async remove(id: string, deletedBy: Usuario): Promise<void> {
+  async remove(id: string): Promise<void> {
     try {
-      // Solo los profesores pueden eliminar asesorías
-      if (
-        deletedBy.rol !== RolUsuario.PROFESOR_TIEMPO_COMPLETO &&
-        deletedBy.rol !== RolUsuario.PROFESOR_ASIGNATURA
-      ) {
-        throw new ErrorManager({
-          type: 'FORBIDDEN',
-          message: 'Solo los profesores pueden eliminar asesorías',
-        });
-      }
-
       const asesoria = await this.findOne(id);
 
       // Eliminación física (no soft-delete según requerimientos)
