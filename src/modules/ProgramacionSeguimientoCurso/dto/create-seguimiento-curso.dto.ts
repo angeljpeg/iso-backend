@@ -1,4 +1,5 @@
 import { IsDate, IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateSeguimientoCursoDto {
@@ -13,6 +14,7 @@ export class CreateSeguimientoCursoDto {
   cuatrimestreId: string;
 
   @ApiPropertyOptional({ description: 'Fecha de Revision' })
+  @Type(() => Date)
   @IsDate()
   @IsOptional()
   fechaRevision?: Date;

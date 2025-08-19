@@ -5,7 +5,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SeguimientoCurso } from './entities/seguimiento-curso.entity';
+import {
+  EstadoSeguimiento,
+  SeguimientoCurso,
+} from './entities/seguimiento-curso.entity';
 import { SeguimientoDetalle } from './entities/seguimiento-detalle.entity';
 import { CreateSeguimientoCursoDto } from './dto/create-seguimiento-curso.dto';
 import { UpdateSeguimientoCursoDto } from './dto/update-seguimiento-curso.dto';
@@ -243,8 +246,45 @@ export class ProgramacionSeguimientoCursoService {
       // Validación de permisos
       this.validateSeguimientoPermissions(seguimiento, usuario, 'update');
 
-      Object.assign(seguimiento, dto);
-      return await this.seguimientoCursoRepository.save(seguimiento);
+      // Ignorar numeroRevision del DTO para evitar NaN y forzar incremento automático
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { numeroRevision: _, ...dtoSinNumeroRevision } =
+        (dto as unknown as Record<string, unknown>) || {};
+      Object.assign(seguimiento, dtoSinNumeroRevision);
+
+      // Incrementar número de revisión automáticamente en cada actualización
+      const prevRevision =
+        typeof seguimiento.numeroRevision === 'number' &&
+        Number.isFinite(seguimiento.numeroRevision)
+          ? seguimiento.numeroRevision
+          : 0;
+      seguimiento.numeroRevision = prevRevision + 1;
+
+      // Si se establece un estado de revisión/aprobación, asignar revisor
+      if (
+        seguimiento.estado &&
+        (seguimiento.estado === EstadoSeguimiento.REVISADO ||
+          seguimiento.estado === EstadoSeguimiento.APROBADO ||
+          seguimiento.estado === EstadoSeguimiento.RECHAZADO)
+      ) {
+        seguimiento.revisadoPorId = usuario.id;
+      }
+
+      await this.seguimientoCursoRepository.save(seguimiento);
+
+      // Devolver entidad fresca con relaciones
+      return await this.seguimientoCursoRepository.findOne({
+        where: { id },
+        relations: [
+          'detalles',
+          'cargaAcademica',
+          'cargaAcademica.profesor',
+          'cargaAcademica.grupo',
+          'cargaAcademica.cuatrimestre',
+          'cuatrimestre',
+          'revisadoPor',
+        ],
+      });
     } catch (error) {
       if (
         error instanceof BadRequestException ||

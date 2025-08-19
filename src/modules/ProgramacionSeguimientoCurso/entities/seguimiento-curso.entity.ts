@@ -50,7 +50,7 @@ export class SeguimientoCurso {
   fechaSeguimientoFinal: Date;
 
   @Column({ type: 'int', nullable: false, default: 0 })
-  numeroRevision: number = 0;
+  numeroRevision: number;
 
   // Relaciones
   @ManyToOne(() => CargaAcademica, { nullable: false, eager: true })
