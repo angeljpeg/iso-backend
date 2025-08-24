@@ -141,9 +141,25 @@ Envía un recordatorio de asesoría.
 }
 ```
 
+### POST `/correo/alumno-reprobado-estadia`
+
+Envía una notificación cuando un alumno es reprobado en estadías por falta de avances.
+
+**Body:**
+
+```json
+{
+  "email": "coordinador@utn.edu.mx",
+  "nombre": "Juan Carlos Pérez González",
+  "matricula": "2021001234",
+  "carrera": "Ingeniería en Sistemas Computacionales",
+  "grupo": "ISC-2021-A"
+}
+```
+
 ### GET `/correo/verificar-conexion`
 
-Verifica la conexión del servicio de correo (solo admin/coordinador).
+Verifica la conexión del servicio de correo (solo coordinador).
 
 ## Plantillas Disponibles
 
@@ -177,6 +193,19 @@ Plantilla para recordatorios de asesorías.
 - `nombre`: Nombre del usuario
 - `fecha`: Fecha de la asesoría
 - `materia`: Materia de la asesoría
+
+### alumno-reprobado-estadia.hbs
+
+Plantilla para notificar cuando un alumno es reprobado en estadías por falta de avances.
+
+**Parámetros:**
+
+- `nombre`: Nombre completo del alumno
+- `matricula`: Matrícula del alumno
+- `carrera`: Carrera del alumno
+- `grupo`: Grupo del alumno
+- `fechaBaja`: Fecha en que se dio de baja al alumno
+- `fechaNotificacion`: Fecha de la notificación
 
 ## Uso en Otros Servicios
 

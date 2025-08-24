@@ -157,6 +157,31 @@ export class CorreoService {
   }
 
   /**
+   * Envía correo de notificación de alumno reprobado en estadía
+   */
+  async enviarNotificacionAlumnoReprobado(
+    email: string,
+    nombre: string,
+    matricula: string,
+    carrera: string,
+    grupo: string,
+  ): Promise<boolean> {
+    return this.enviarCorreoTemplate({
+      para: email,
+      asunto: 'Alumno Reprobado - Estadía - Sistema ISO',
+      template: 'alumno-reprobado-estadia',
+      contexto: {
+        nombre,
+        matricula,
+        carrera,
+        grupo,
+        fechaBaja: new Date().toLocaleDateString('es-ES'),
+        fechaNotificacion: new Date().toLocaleDateString('es-ES'),
+      },
+    });
+  }
+
+  /**
    * Verifica la conexión del servicio de correo
    */
   async verificarConexion(): Promise<boolean> {

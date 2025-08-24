@@ -17,9 +17,11 @@ import { CorreoService } from './correo.service';
 import { EnviarCorreoDto } from './dto/enviar-correo.dto';
 import { EnviarCorreoTemplateDto } from './dto/enviar-correo-template.dto';
 import { EnviarCorreoMasivoDto } from './dto/enviar-correo-masivo.dto';
-import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
-import { RolesGuard } from '@common/guards/roles.guard';
-import { Roles } from '@common/decorators/roles.decorator';
+import { RolesGuard } from '@guards/roles.guard';
+import { JwtAuthGuard } from '@guards/jwt-auth.guard';
+import { Roles } from '@decorators/roles.decorator';
+import { RolUsuario } from '@modules/Usuarios/entities/usuario.entity';
+import { NotificacionAlumnoReprobadoDto } from './dto/notificacion-alumno-reprobado.dto';
 
 @ApiTags('Correo')
 @Controller('correo')
@@ -194,6 +196,35 @@ export class CorreoController {
     };
   }
 
+  @Post('alumno-reprobado-estadia')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Enviar notificación de alumno reprobado en estadía',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Notificación de alumno reprobado enviada exitosamente',
+  })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  async enviarNotificacionAlumnoReprobado(
+    @Body() dto: NotificacionAlumnoReprobadoDto,
+  ) {
+    const resultado =
+      await this.correoService.enviarNotificacionAlumnoReprobado(
+        dto.email,
+        dto.nombre,
+        dto.matricula,
+        dto.carrera,
+        dto.grupo,
+      );
+    return {
+      success: resultado,
+      message: resultado
+        ? 'Notificación de alumno reprobado enviada exitosamente'
+        : 'Error al enviar notificación',
+    };
+  }
+
   @Get('verificar-conexion')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verificar conexión del servicio de correo' })
@@ -209,7 +240,7 @@ export class CorreoController {
     },
   })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
-  @Roles('admin', 'coordinador')
+  @Roles(RolUsuario.COORDINADOR)
   async verificarConexion() {
     const conectado = await this.correoService.verificarConexion();
     return {
