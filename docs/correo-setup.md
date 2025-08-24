@@ -125,10 +125,10 @@ async enviarBienvenida(email: string, nombre: string, rol: string) {
 }
 
 async enviarNotificacionAlumnoReprobado(
-  email: string, 
-  nombre: string, 
-  matricula: string, 
-  carrera: string, 
+  email: string,
+  nombre: string,
+  matricula: string,
+  carrera: string,
   grupo: string
 ) {
   return this.correoService.enviarNotificacionAlumnoReprobado(
