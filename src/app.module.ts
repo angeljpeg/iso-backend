@@ -12,6 +12,7 @@ import { EstadiasModule } from './modules/Estadias/estadias.module';
 import { AsesoriasModule } from '@modules/Asesorias/asesorias.module';
 import { TutoriasModule } from './modules/Tutorias/tutorias.module';
 import { NecesidadesEspecialesModule } from './modules/NecesidadesEspeciales/necesidades-especiales.module';
+import { CorreoModule } from './modules/Correo/correo.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { NecesidadesEspecialesModule } from './modules/NecesidadesEspeciales/nec
     AsesoriasModule,
     TutoriasModule,
     NecesidadesEspecialesModule,
+    CorreoModule,
   ],
   controllers: [],
   providers: [],

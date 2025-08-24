@@ -1,0 +1,91 @@
+<html lang='es'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Recordatorio de Asesoría</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background-color: #7c3aed;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+      }
+      .content {
+        background-color: #faf5ff;
+        padding: 30px;
+        border-radius: 0 0 8px 8px;
+        border: 1px solid #ddd6fe;
+      }
+      .reminder-box {
+        background-color: #ede9fe;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        border-left: 4px solid #7c3aed;
+      }
+      .appointment-details {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        border: 1px solid #e2e8f0;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 30px;
+        color: #64748b;
+        font-size: 14px;
+      }
+      .important {
+        color: #dc2626;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='header'>
+      <h1>⏰ Recordatorio de Asesoría</h1>
+      <p>Sistema ISO - UTN</p>
+    </div>
+
+    <div class='content'>
+      <h2>Hola {{nombre}},</h2>
+
+      <div class='reminder-box'>
+        <h3>📅 Tienes una asesoría programada</h3>
+        <p>Este es un recordatorio de tu próxima asesoría académica.</p>
+      </div>
+
+      <div class='appointment-details'>
+        <h3>Detalles de la asesoría:</h3>
+        <p><strong>Materia:</strong> {{materia}}</p>
+        <p><strong>Fecha:</strong> <span class='important'>{{fecha}}</span></p>
+      </div>
+
+      <p>Por favor, asegúrate de:</p>
+      <ul>
+        <li>Llegar 10 minutos antes de la hora programada</li>
+        <li>Traer tus materiales de estudio</li>
+        <li>Preparar tus preguntas o dudas</li>
+      </ul>
+
+      <p>Si necesitas cancelar o reprogramar la asesoría, contacta a tu profesor
+        con anticipación.</p>
+
+      <div class='footer'>
+        <p>Fecha del recordatorio: {{fecha}}</p>
+        <p>© Sistema ISO - UTN</p>
+        <p>Este es un correo automático, por favor no respondas a este mensaje.</p>
+      </div>
+    </div>
+  </body>
+</html>
