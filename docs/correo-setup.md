@@ -71,6 +71,7 @@ MAIL_SECURE=false
 - Bienvenida: `POST /correo/bienvenida`
 - Notificación de estadía: `POST /correo/notificacion-estadia`
 - Recordatorio de asesoría: `POST /correo/recordatorio-asesoria`
+- Alumno reprobado en estadía: `POST /correo/alumno-reprobado-estadia`
 
 ### 5. Verificación de conexión
 
@@ -94,6 +95,11 @@ MAIL_SECURE=false
 - Parámetros: `nombre`, `fecha`, `materia`
 - Uso: Recordatorios de asesorías programadas
 
+### alumno-reprobado-estadia.hbs
+
+- Parámetros: `nombre`, `matricula`, `carrera`, `grupo`, `fechaBaja`, `fechaNotificacion`
+- Uso: Notificaciones cuando un alumno es reprobado en estadías por falta de avances
+
 ## Uso del Servicio
 
 ### Envío básico
@@ -116,6 +122,18 @@ async enviarNotificacion(email: string, nombre: string) {
 ```typescript
 async enviarBienvenida(email: string, nombre: string, rol: string) {
   return this.correoService.enviarCorreoBienvenida(email, nombre, rol);
+}
+
+async enviarNotificacionAlumnoReprobado(
+  email: string, 
+  nombre: string, 
+  matricula: string, 
+  carrera: string, 
+  grupo: string
+) {
+  return this.correoService.enviarNotificacionAlumnoReprobado(
+    email, nombre, matricula, carrera, grupo
+  );
 }
 ```
 
